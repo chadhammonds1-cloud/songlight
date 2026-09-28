@@ -387,8 +387,9 @@ const World = (() => {
     gr.addColorStop(0, color); gr.addColorStop(1, 'rgba(255,255,255,0)');
     g.globalAlpha = a; g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); g.globalAlpha = 1;
   }
-  const GOLD = '#ffc233';
-  const LANDMARK_H = { stone: 200, pools: 70, lanterns: 150, cottage: 190, gate: 200, lake: 70, bridge: 150, tower: 290, glade: 220, canyon: 230, stairs: 150, crystal: 260, belltree: 240, hall: 200, windmill: 250, bellarch: 200 };
+  const GOLD = '#ffc233', TEAL_C = '#19c3b3', VIOLET_C = '#7b5cff';
+  const LANDMARK_H = { stone: 200, pools: 70, lanterns: 150, cottage: 190, gate: 200, lake: 70, bridge: 150, tower: 290, glade: 220, canyon: 230, stairs: 150, crystal: 260, belltree: 240, hall: 200, windmill: 250, bellarch: 200,
+    pines: 250, boat: 90, swing: 230, woodpecker: 260, willow: 250, cairn: 170, oak: 300 };
 
   const LANDMARKS = {
     stone(lit, t) {
@@ -542,6 +543,94 @@ const World = (() => {
         g.fillStyle = lit ? GOLD : '#77738c'; g.beginPath(); g.moveTo(-14, 34); g.quadraticCurveTo(-14, 8, 0, 8); g.quadraticCurveTo(14, 8, 14, 34); g.closePath(); g.fill();
         g.restore();
       });
+    },
+    // Four pines, each one interval farther up the ladder: 2nd, 3rd, 4th, 5th.
+    pines(lit, t) {
+      [[-120, 110], [-40, 150], [40, 190], [120, 230]].forEach(([x, h], i) => {
+        g.fillStyle = c('#6b4424', lit); g.fillRect(x - 6, -24, 12, 28);
+        g.fillStyle = c('#0f7f6a', lit);
+        for (let k = 0; k < 3; k++) {
+          const top = -h + k * h * 0.26, base = -24 - (2 - k) * h * 0.2, w = 22 + k * 10 + h * 0.06;
+          g.beginPath(); g.moveTo(x, top); g.lineTo(x + w, base); g.lineTo(x - w, base); g.closePath(); g.fill();
+        }
+        halo(x, -h - 10, 34, GOLD, lit * (0.7 + 0.3 * Math.sin(t * 3 + i)));
+        g.fillStyle = lit ? '#fff4c2' : '#5a5570';
+        g.font = '800 18px Grandstander, sans-serif'; g.textAlign = 'center'; g.fillText(String(i + 2), x, -h - 4); g.textAlign = 'start';
+      });
+    },
+    boat(lit, t) {
+      halo(0, 0, 190, '#bff6ff', lit * 0.4);
+      g.fillStyle = c('#3fb7ff', lit); g.beginPath(); g.ellipse(0, 10, 190, 18, 0, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = `rgba(255,255,255,${0.2 + lit * 0.45})`; g.lineWidth = 2;
+      for (let i = 0; i < 3; i++) { const k = ((t * 0.5 + i / 3) % 1); g.beginPath(); g.moveTo(-160 + k * 320, 8 + i * 4); g.lineTo(-130 + k * 320, 8 + i * 4); g.stroke(); }
+      const drift = lit ? Math.sin(t * 0.8) * 40 : 0, bob = lit ? Math.sin(t * 2) * 2 : 0;
+      g.save(); g.translate(drift, bob);
+      g.fillStyle = c('#c9884a', lit); g.beginPath(); g.moveTo(-54, -4); g.lineTo(54, -4); g.lineTo(38, 12); g.lineTo(-38, 12); g.closePath(); g.fill();
+      g.strokeStyle = c('#6c4a2b', lit); g.lineWidth = 3;
+      const row = lit ? Math.sin(t * 2.4) * 0.5 : 0.3;
+      g.beginPath(); g.moveTo(0, -6); g.lineTo(Math.cos(row) * 60, 10 + Math.sin(row) * 6); g.stroke();
+      g.restore();
+      if (lit) [-140, -90, 100, 150].forEach((x, i) => { g.fillStyle = '#ff8fc2'; g.beginPath(); g.ellipse(x, 8, 11, 5, 0, 0, 7); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(x, 4, 4 + Math.sin(t * 2 + i), 0, 7); g.fill(); });
+    },
+    swing(lit, t) {
+      g.fillStyle = c('#6b4424', lit); g.fillRect(-120, -220, 30, 224);
+      g.fillRect(-100, -212, 190, 16);
+      g.fillStyle = c('#17a38a', lit); [[-110, -220, 60], [-40, -236, 50], [40, -230, 54]].forEach(([x, y, r]) => { g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); });
+      const ang = lit ? Math.sin(t * 1.9) * 0.45 : 0;
+      g.save(); g.translate(20, -198); g.rotate(ang);
+      g.strokeStyle = c('#e9d7b0', lit); g.lineWidth = 3;
+      g.beginPath(); g.moveTo(-26, 0); g.lineTo(-26, 150); g.moveTo(26, 0); g.lineTo(26, 150); g.stroke();
+      g.fillStyle = c('#c9884a', lit); g.fillRect(-34, 148, 68, 10);
+      g.restore();
+      if (lit) [-60, 0, 60].forEach((x, i) => halo(x, -186, 24, GOLD, 0.7 + 0.3 * Math.sin(t * 4 + i)));
+    },
+    woodpecker(lit, t) {
+      g.fillStyle = c('#7a4f2a', lit); g.fillRect(-26, -230, 52, 234);
+      g.fillStyle = c('#17a38a', lit); [[-50, -240, 56], [50, -246, 52], [0, -280, 58]].forEach(([x, y, r]) => { g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); });
+      g.fillStyle = '#241d52'; g.beginPath(); g.ellipse(0, -150, 11, 14, 0, 0, Math.PI * 2); g.fill();
+      if (!lit) return;
+      const peck = Math.max(0, Math.sin(t * 16)) * (Math.floor(t * 2) % 2 ? 1 : 0);
+      g.save(); g.translate(40 - peck * 6, -120);
+      g.fillStyle = '#241d52'; g.beginPath(); g.ellipse(0, 0, 11, 20, 0.2, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#ff5d73'; g.beginPath(); g.arc(-2, -20, 8, Math.PI, 0); g.fill();
+      g.fillStyle = '#fff'; g.beginPath(); g.arc(-3, -16, 6, 0, 7); g.fill();
+      g.fillStyle = '#ffc233'; g.beginPath(); g.moveTo(-8, -16); g.lineTo(-22, -13); g.lineTo(-8, -11); g.fill();
+      g.restore();
+      if (peck > 0.6) { g.fillStyle = '#fff4c2'; star4(16, -134, 3); }
+    },
+    willow(lit, t) {
+      const moonA = 0.25 + lit * 0.75;
+      halo(90, -250, 110, '#e8f0ff', moonA * 0.7);
+      g.fillStyle = `rgba(245,248,255,${moonA})`; g.beginPath(); g.arc(90, -250, 28, 0, Math.PI * 2); g.fill();
+      g.fillStyle = c('#6b4424', lit); g.beginPath(); g.moveTo(-18, 4); g.lineTo(-10, -170); g.lineTo(10, -170); g.lineTo(18, 4); g.fill();
+      g.fillStyle = c('#39c18e', lit); g.beginPath(); g.ellipse(0, -190, 110, 50, 0, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = c('#1f9e6e', lit); g.lineWidth = 4; g.lineCap = 'round';
+      for (let i = 0; i < 11; i++) {
+        const x = -100 + i * 20, sw = Math.sin(t * 1.2 + i * 0.7) * (lit ? 8 : 2), len = 90 + ((i * 29) % 40);
+        g.beginPath(); g.moveTo(x, -170); g.quadraticCurveTo(x + sw, -170 + len * 0.6, x + sw * 1.6, -170 + len); g.stroke();
+      }
+      g.lineCap = 'butt';
+      if (lit) for (let i = 0; i < 6; i++) halo(Math.sin(t * 0.6 + i * 2) * 120, -60 - ((i * 43) % 90), 10, '#fff4a8', 0.8);
+    },
+    // Three stones stacked like the notes of a chord.
+    cairn(lit, t) {
+      halo(0, -80, 150, GOLD, lit * 0.4);
+      [[0, -18, 62, 22, TEAL_C], [4, -64, 48, 20, VIOLET_C], [-2, -104, 34, 18, GOLD]].forEach(([x, y, rx, ry, col], i) => {
+        g.fillStyle = c('#8d86b8', lit); g.beginPath(); g.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); g.fill();
+        if (lit) { g.globalAlpha = 0.55 + 0.35 * Math.sin(t * 2.5 - i * 0.8); g.fillStyle = col; g.beginPath(); g.ellipse(x, y, rx * 0.8, ry * 0.45, 0, 0, Math.PI * 2); g.fill(); g.globalAlpha = 1; }
+      });
+      g.fillStyle = lit ? '#fff4c2' : '#5a5570'; g.font = '800 14px Grandstander, sans-serif'; g.textAlign = 'center';
+      ['C', 'E', 'G'].forEach((ch, i) => g.fillText(ch, [0, 4, -2][i], [-13, -59, -99][i]));
+      g.textAlign = 'start';
+    },
+    oak(lit, t) {
+      halo(0, -150, 260, GOLD, lit * (0.45 + 0.15 * Math.sin(t * 2)));
+      g.fillStyle = c('#6b4424', lit);
+      g.beginPath(); g.moveTo(-70, 4); g.quadraticCurveTo(-50, -80, -44, -190); g.lineTo(44, -190); g.quadraticCurveTo(50, -80, 70, 4); g.closePath(); g.fill();
+      g.fillStyle = c('#0f7f6a', lit);
+      [[-120, -220, 80], [120, -220, 80], [-60, -270, 90], [60, -270, 90], [0, -300, 90]].forEach(([x, y, r]) => { g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); });
+      g.fillStyle = lit ? '#ffe28a' : '#3a2a1a'; g.beginPath(); g.moveTo(-24, 4); g.lineTo(-24, -60); g.arc(0, -60, 24, Math.PI, 0); g.lineTo(24, 4); g.fill();
+      if (lit) for (let i = 0; i < 14; i++) { const x = Math.sin(i * 2.3) * 170, y = -200 - Math.cos(i * 1.7) * 90; halo(x, y, 12, '#fff4c2', 0.5 + 0.5 * Math.sin(t * 3 + i)); }
     },
   };
 

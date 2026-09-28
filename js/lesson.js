@@ -91,11 +91,15 @@ const LessonUI = (() => {
   const add = (w, html) => { w.insertAdjacentHTML('beforeend', html); return w.lastElementChild; };
   const feedback = w => { let f = $('.feedback', w); if (!f) f = add(w, '<p class="feedback" aria-live="polite"></p>'); return t => { f.innerHTML = t; }; };
 
+  // [glyph, name, length, count-along, beats, the notes it plays]
   const VALUES = {
     q: ['♩', 'Quarter note', '1 beat', 'ta', 1],
     h: ['𝅗𝅥', 'Half note', '2 beats', 'ta – a', 2],
     'h.': ['𝅗𝅥.', 'Dotted half note', '3 beats', 'ta – a – a', 3],
     w: ['𝅝', 'Whole note', '4 beats', 'ta – a – a – a', 4],
+    e: ['♪', 'Eighth note', '½ beat', 'ti', 1, [0.5]],
+    ee: ['♫', 'Two eighth notes', '1 beat together', 'ti – ti', 1, [0.5, 0.5]],
+    tie: ['𝅗𝅥‿♩', 'Tied notes', '2 + 1 = 3 beats', 'ta – a – a', 3, [3]],
   };
 
   function renderShow(sh, w) {
@@ -130,8 +134,8 @@ const LessonUI = (() => {
       case 'values': {
         const el = add(w, `<div class="values">${sh.values.map(v => `<button class="value" data-v="${v}"><span class="glyph">${VALUES[v][0]}</span><b>${VALUES[v][1]}</b><span>${VALUES[v][2]}</span><em>“${VALUES[v][3]}”</em></button>`).join('')}</div>`);
         el.querySelectorAll('.value').forEach(b => b.onclick = () => {
-          const beats = VALUES[b.dataset.v][4], spb = 0.7, t = Sound.init().currentTime + 0.05;
-          Sound.play(72, t, beats * spb * 0.95, 0.6);
+          const [, , , , beats, pat = [beats]] = VALUES[b.dataset.v], spb = 0.7, t = Sound.init().currentTime + 0.05;
+          pat.reduce((at, d) => { Sound.play(72, t + at * spb, d * spb * 0.9, 0.6); return at + d; }, 0);
           for (let k = 0; k < beats; k++) Sound.click(t + k * spb, k === 0);
           b.classList.remove('playing'); void b.offsetWidth; b.classList.add('playing');
         });
@@ -252,7 +256,9 @@ const LessonUI = (() => {
 
     rhythm(st, w, done) {
       const toks = st.rhythm.split(/\s+/).filter(t => t && t !== '|');
-      const rs = Music.compile({ time: st.time, tempo: st.tempo, notation: 'prestaff', voices: [{ hand: 'R', notes: toks.map(d => 'E4:' + d).join(' ') }] });
+      // tokens: q, h., e… ; "q~" ties into the next ; "rq" is a quarter rest (shown on a staff)
+      const tok = d => (d[0] === 'r' ? `r:${d.slice(1)}` : d.endsWith('~') ? `E4:${d.slice(0, -1)}::~` : 'E4:' + d);
+      const rs = Music.compile({ time: st.time, tempo: st.tempo, notation: toks.some(d => d[0] === 'r') ? 'staff' : 'prestaff', voices: [{ hand: 'R', notes: toks.map(tok).join(' ') }] });
       const el = add(w, `<div class="rhythm"><div class="score mini"></div><div class="countin" aria-live="polite"></div>
         <div class="rh-row"><button class="btn primary go">▶ Start</button><button class="pad" aria-label="Tap the beat">TAP</button></div>
         <p class="small">Tap the pad, press <kbd>Space</kbd>, or play any key.</p></div>`);
@@ -299,7 +305,7 @@ const LessonUI = (() => {
     together(st, w, done) {
       const ms = st.notes.map(Music.midi), times = {};
       let n = 0;
-      piano.hint(ms.map(m => ({ midi: m, hand: m < 60 ? 'L' : 'R' })));
+      piano.hint(ms.map((m, i) => ({ midi: m, finger: st.fingers?.[i], hand: st.hands?.[i] || (m < 60 ? 'L' : 'R') })));
       const el = add(w, `<div class="pips big">${pips(st.count, 0)}</div>`);
       const fb = feedback(w);
       listen('down', m => {
@@ -310,9 +316,53 @@ const LessonUI = (() => {
         if (ms.every(x => Input.isHeld(x) || now - (times[x] || 0) < 350)) {
           ms.forEach(x => { times[x] = 0; piano.flash(x, 'good'); });
           n++; el.innerHTML = pips(st.count, n);
-          if (n >= st.count) { fb('Both hands, together! ' + praise()); done(); } else fb('Again!');
+          if (n >= st.count) { fb((st.praise || 'Both hands, together!') + ' ' + praise()); done(); } else fb('Again!');
         }
       });
+    },
+
+    // Legato: each key is still down (or only just up) when the next is pressed. Staccato: short, bouncy presses.
+    touch(st, w, done) {
+      const targets = st.notes.map(Music.midi);
+      const rounds = st.rounds || ['legato', 'staccato'];
+      let r = 0, idx = 0, lastUp = 0, downAt = {};
+      const el = add(w, `<div class="dyn-row">${rounds.map(t => `<span class="dchip" data-t="${t}">${t === 'legato' ? '⌒ legato' : '• staccato'}</span>`).join('')}</div>
+        <div class="targets">${targets.map(m => `<span class="tchip">${Music.letterOf(m)}</span>`).join('')}</div>`);
+      const fb = feedback(w), chips = el.querySelectorAll('.tchip');
+      const hintNext = () => piano.hint([{ midi: targets[idx], finger: st.fingers?.[idx], hand: 'R' }]);
+      const restart = msg => { idx = 0; chips.forEach(c => c.classList.remove('got')); piano.clearHints(); hintNext(); fb(msg); };
+      const say = () => fb(rounds[r] === 'legato'
+        ? '<b>Legato</b>: smooth and connected. Keep each key down until the next one is pressed.'
+        : '<b>Staccato</b>: short and bouncy. Let each key spring right back up.');
+      const finish = () => {
+        $(`[data-t="${rounds[r]}"]`, w).classList.add('got');
+        r++; idx = 0; downAt = {};
+        if (r >= rounds.length) { piano.clearHints(); fb(praise() + ' You can play smooth <i>and</i> bouncy.'); done(); return; }
+        Sound.chime('soft'); fb(praise() + ' Smooth as water.');
+        later(() => { chips.forEach(c => c.classList.remove('got')); hintNext(); say(); }, 900);
+      };
+      listen('down', m => {
+        if (r >= rounds.length || idx >= targets.length) return;
+        if (m !== targets[idx]) { piano.flash(m, 'bad'); return; }
+        const now = performance.now();
+        if (rounds[r] === 'legato' && idx > 0 && !Input.isHeld(targets[idx - 1]) && now - lastUp > 110) {
+          piano.flash(m, 'bad'); restart('There was a little gap. Hold each key until the next one goes down. Start again from the first key.'); return;
+        }
+        downAt[m] = now; piano.flash(m, 'good'); piano.unhint(m); chips[idx].classList.add('got');
+        idx++;
+        if (idx < targets.length) hintNext();
+        else if (rounds[r] === 'legato') finish();
+      });
+      listen('up', m => {
+        if (r >= rounds.length) return;
+        const now = performance.now();
+        lastUp = now;
+        if (rounds[r] !== 'staccato' || !downAt[m]) return;
+        if (now - downAt[m] > 300) { restart('That one was held too long. Make every note a quick <b>bounce</b>. Start again!'); downAt = {}; return; }
+        delete downAt[m];
+        if (idx >= targets.length && !Object.keys(downAt).length) finish();
+      });
+      hintNext(); say();
     },
 
     dyn(st, w, done) {
@@ -335,21 +385,33 @@ const LessonUI = (() => {
       });
     },
 
+    // pairs: [from, to, answer, 'harm'?]. Harmonic pairs are stacked and sound together.
     interval(st, w, done) {
       let k = 0;
+      const choices = st.choices || [['step', 'Step (2nd)'], ['skip', 'Skip (3rd)']];
       const el = add(w, `<div class="read"><div class="score mini read-score"></div>
-        <div class="choices"><button class="choice" data-v="step">Step (2nd)</button><button class="choice" data-v="skip">Skip (3rd)</button></div>
+        <div class="choices">${choices.map(([v, label]) => `<button class="choice" data-v="${v}">${label}</button>`).join('')}</div>
         <button class="chip-btn hear">▶ Hear it</button><div class="pips big">${pips(st.pairs.length, 0)}</div></div>`);
       const host = $('.read-score', el), fb = feedback(w);
-      const hear = () => { const [a, b] = st.pairs[k]; const t = Sound.init().currentTime + 0.05; Sound.play(Music.midi(a), t, 0.5); Sound.play(Music.midi(b), t + 0.55, 0.6); };
-      const show = () => { const [a, b] = st.pairs[k]; Notation.render(host, Music.compile({ time: [4, 4], notation: 'staff', voices: [{ hand: 'R', notes: `${a}:h ${b}:h` }] }), { hideTime: true, maxPerLine: 1, width: 260, sp: 11 }); };
+      const hear = () => {
+        const [a, b, , harm] = st.pairs[k], t = Sound.init().currentTime + 0.05;
+        Sound.play(Music.midi(a), t, harm ? 1.2 : 0.5); Sound.play(Music.midi(b), harm ? t : t + 0.55, harm ? 1.2 : 0.6);
+      };
+      const show = () => {
+        const [a, b, , harm] = st.pairs[k];
+        Notation.render(host, Music.compile({ time: [4, 4], notation: 'staff', voices: [{ hand: 'R', notes: harm ? `${a}+${b}:w` : `${a}:h ${b}:h` }] }), { hideTime: true, maxPerLine: 1, width: 260, sp: 11 });
+      };
       $('.hear', el).onclick = hear;
       el.querySelectorAll('.choice').forEach(btn => btn.onclick = () => {
         if (k >= st.pairs.length) return;
         if (btn.dataset.v === st.pairs[k][2]) {
           k++; $('.pips', el).innerHTML = pips(st.pairs.length, k);
-          if (k >= st.pairs.length) { fb('You can read steps and skips!'); done(); } else { fb(praise()); show(); }
-        } else { fb(st.pairs[k][2] === 'skip' ? 'Look closer: line to line (or space to space) is a skip.' : 'Look closer: line to space is a step.'); Sound.chime('no'); }
+          if (k >= st.pairs.length) { fb(st.choices ? 'You can measure intervals!' : 'You can read steps and skips!'); done(); } else { fb(praise()); show(); }
+        } else {
+          const hintText = st.choices ? 'Count every line and space from the bottom note to the top note, <b>including both</b>.'
+            : st.pairs[k][2] === 'skip' ? 'Look closer: line to line (or space to space) is a skip.' : 'Look closer: line to space is a step.';
+          fb(hintText); Sound.chime('no');
+        }
       });
       show();
     },

@@ -139,7 +139,8 @@ const Notation = (() => {
         }
       }
       evs.forEach((e, ei) => {
-        const { x, s } = beatX(e.beat);
+        const { x, s, si } = beatX(e.beat);
+        e._x = x; e._s = s; e._si = si;
         const g = E('g', { class: 'note' + (e.rest ? ' rest' : '') }, gNotes);
         glyphs[vi + ':' + ei] = g;
         if (e.rest) { if (staff) rest(g, s, e, x); return; }
@@ -150,6 +151,7 @@ const Notation = (() => {
         if (e.beamDir !== undefined) up = e.beamDir;
         else if (staff) up = e.pitches.reduce((t, p) => t + p.dia, 0) / e.pitches.length < (hand === 'L' ? 22 : 34);
         else up = hand !== 'L';
+        e._ys = ys; e._up = up;
         const hollow = e.dur >= 2;
         e.pitches.forEach((p, i) => {
           const y = ys[i];
@@ -164,6 +166,10 @@ const Notation = (() => {
           }
         });
         const yTop = Math.min(...ys), yBot = Math.max(...ys);
+        if (e.stacc) {
+          const below = up && e.dur < 4;
+          E('circle', { cx: x, cy: below ? yBot + sp * 1.25 : yTop - sp * 1.25, r: sp * 0.26, class: 'dot stacc' }, g);
+        }
         if (e.dur < 4) {
           const sx = up ? x + rx * 0.92 : x - rx * 0.92;
           const y2 = up ? yTop - stemLen : yBot + stemLen;
@@ -196,7 +202,68 @@ const Notation = (() => {
         const th = sp * 0.5 * (up ? 1 : -1);
         E('polygon', { points: `${a._stem.x},${yb} ${b._stem.x},${yb} ${b._stem.x},${yb + th} ${a._stem.x},${yb + th}`, class: 'beam' }, gNotes);
       }
+      curves(evs);
     });
+
+    // A curved line from (x1,y) to (x2,y) bowing by `bow` (negative = upward).
+    function arc(x1, y1, x2, y2, bow, cls) {
+      const w = Math.max(sp * 0.9, x2 - x1), k = Math.min(sp * 1.4, w * 0.35);
+      E('path', { d: `M${x1} ${y1} C${x1 + k} ${y1 + bow} ${x1 + w - k} ${y2 + bow} ${x1 + w} ${y2} C${x1 + w - k} ${y2 + bow * 0.72} ${x1 + k} ${y1 + bow * 0.72} ${x1} ${y1}Z`, class: cls }, gStatic);
+    }
+    function sysEnd(s) { return s.head + s.count * s.mW - sp * 0.6; }
+    function sysStart(s) { return s.head + sp * 0.4; }
+    // Split a span across line breaks: calls fn(x1, x2, s, isFirst, isLast) once per system.
+    function span(a, b, fn) {
+      for (let si = a._si; si <= b._si; si++) {
+        const s = systems[si];
+        fn(si === a._si ? a._x : sysStart(s), si === b._si ? b._x : sysEnd(s), s, si === a._si, si === b._si);
+      }
+    }
+    function dynY(s) { return staff ? s.tt + sp * 7.6 : s.mid + sp * 0.6; }
+
+    function curves(evs) {
+      evs.forEach((e, i) => {
+        if (e.rest || e._x === undefined) return;
+        // ties: same pitch in the next event
+        const nx = evs[i + 1];
+        if (e.tie && nx && !nx.rest) {
+          e.pitches.forEach((p, pi) => {
+            const qi = nx.pitches.findIndex(q => q.midi === p.midi);
+            if (qi < 0) return;
+            const down = e._up && e.dur < 4, bow = (down ? 1 : -1) * sp * 1.1, off = (down ? 1 : -1) * ry * 1.4;
+            span(e, nx, (x1, x2, s, first, last) => arc(first ? x1 + rx : x1, (first ? e._ys[pi] : nx._ys[qi]) + off, last ? x2 - rx : x2, (last ? nx._ys[qi] : e._ys[pi]) + off, bow, 'tie'));
+          });
+        }
+        // slurs: from '(' to the next ')' in this voice
+        if (e.slur === 'start') {
+          let j = i + 1;
+          while (j < evs.length && evs[j].slur !== 'end') j++;
+          const end = evs[Math.min(j, evs.length - 1)];
+          const inside = evs.slice(i, j + 1).filter(x => !x.rest && x._ys);
+          const above = e.hand !== 'L';
+          span(e, end, (x1, x2, s) => {
+            const here = inside.filter(x => x._s === s);
+            const edge = above
+              ? Math.min(...here.map(x => Math.min(...x._ys) - (x._up && x.dur < 4 ? stemLen : 0))) - sp * 0.9
+              : Math.max(...here.map(x => Math.max(...x._ys) + (!x._up && x.dur < 4 ? stemLen : 0))) + sp * 0.9;
+            arc(x1, edge, x2, edge, (above ? -1 : 1) * sp * 1.3, 'slur');
+          });
+        }
+        // hairpins: from '<' or '>' to the next '/'
+        if (e.hairpin === 'cresc' || e.hairpin === 'dim') {
+          let j = i + 1;
+          while (j < evs.length && evs[j].hairpin !== 'end') j++;
+          const end = evs[Math.min(j, evs.length - 1)];
+          const open = sp * 0.75, cresc = e.hairpin === 'cresc';
+          span(e, end, (x1, x2, s, first, last) => {
+            const a = x1, b = last ? x2 - (end.dyn ? rx * 4.2 : 0) : x2;
+            const y = dynY(s) - sp * 0.6;
+            const w0 = cresc ? (first ? 0 : open * 0.5) : open, w1 = cresc ? open : (last ? 0 : open * 0.5);
+            E('path', { d: `M${b} ${y - w1} L${a} ${y - w0} M${a} ${y + w0} L${b} ${y + w1}`, class: 'hairpin' }, gStatic);
+          });
+        }
+      });
+    }
 
     let curSys = -1;
     const api = {

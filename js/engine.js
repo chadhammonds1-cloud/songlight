@@ -6,6 +6,10 @@ class Performer {
     this.offs = []; this.raf = 0; this.active = false;
   }
 
+  // A tied note lights up every notehead it spans.
+  mark(n, cls) { this.score?.mark(n.glyph, cls); n.tied?.forEach(gl => this.score?.mark(gl, cls)); }
+  static sounding(n) { return n.dur * (n.stacc ? 0.4 : 0.92); }
+
   stop() {
     this.active = false;
     cancelAnimationFrame(this.raf);
@@ -25,12 +29,12 @@ class Performer {
     this.score?.clear();
     const spb = 60 / (this.song.tempo * tempoScale);
     const t0 = ctx.currentTime + 0.3, p0 = performance.now() + 300;
-    this.song.notes.forEach(n => Sound.play(n.midi, t0 + n.beat * spb, n.dur * spb * 0.92, 0.6));
+    this.song.notes.forEach(n => Sound.play(n.midi, t0 + n.beat * spb, Performer.sounding(n) * spb, n.vel ?? 0.6));
     const loop = () => {
       if (!this.active) return;
       const b = (performance.now() - p0) / 1000 / spb;
       this.score?.setCursor(Math.max(0, b));
-      this.piano?.setLit(new Set(this.song.notes.filter(n => b >= n.beat && b < n.beat + n.dur * 0.92).map(n => n.midi)));
+      this.piano?.setLit(new Set(this.song.notes.filter(n => b >= n.beat && b < n.beat + Performer.sounding(n)).map(n => n.midi)));
       if (b > this.song.totalBeats + 0.3) { this.stop(); onEnd?.(); return; }
       this.raf = requestAnimationFrame(loop);
     };
@@ -52,7 +56,7 @@ class Performer {
       this.piano.clearHints();
       this.piano.hint(g.notes);
       this.score?.setCursor(g.beat);
-      g.notes.forEach(n => this.score?.mark(n.glyph, 'now'));
+      g.notes.forEach(n => this.mark(n, 'now'));
       onStep?.(gi, groups.length);
     };
     this.offs.push(Input.on('down', m => {
@@ -63,7 +67,7 @@ class Performer {
       this.piano.flash(m, 'good');
       this.piano.unhint(m);
       if (g.notes.every(n => got.has(n.midi))) {
-        g.notes.forEach(n => this.score?.mark(n.glyph, 'hit'));
+        g.notes.forEach(n => this.mark(n, 'hit'));
         gi++;
         if (gi >= groups.length) { this.stop(); onEnd?.(); return; }
         show();
@@ -88,8 +92,11 @@ class Performer {
     for (let b = -count; b < (metronome ? endBeat : 0); b++) Sound.click(tA + b * spb, ((b % bpm) + bpm) % bpm === 0);
     const req = [], auto = [];
     song.notes.forEach(n => (hands === 'both' || n.hand === hands ? req : auto).push(n));
-    auto.forEach(n => Sound.play(n.midi, tA + n.beat * spb, n.dur * spb * 0.92, 0.42));
-    const win = Math.min(0.38, Math.max(0.16, spb * 0.42)) * windowScale;
+    auto.forEach(n => Sound.play(n.midi, tA + n.beat * spb, Performer.sounding(n) * spb, (n.vel ?? 0.6) * 0.7));
+    // Close notes (eighths) get a narrower window so one press can't claim its neighbour.
+    let gap = 1;
+    for (let i = 1; i < req.length; i++) { const d = req[i].beat - req[i - 1].beat; if (d > 1e-6 && d < gap) gap = d; }
+    const win = Math.min(0.38, Math.max(0.16, spb * 0.42), Math.max(0.11, gap * spb * 0.48)) * windowScale;
     const state = req.map(() => 'pending');
     let wrong = 0, perfect = 0, lastCount = null;
     const now = () => (performance.now() - tP) / 1000;
@@ -108,7 +115,7 @@ class Performer {
         state[best] = 'hit';
         if (bd < 0.1) perfect++;
         this.piano?.flash(m, 'good');
-        this.score?.mark(req[best].glyph, 'hit');
+        this.mark(req[best], 'hit');
       } else {
         wrong++;
         this.piano?.flash(m, 'bad');
@@ -125,7 +132,7 @@ class Performer {
       } else if (lastCount !== 0) { lastCount = 0; onCount?.(0, count); }
       this.score?.setCursor(Math.max(0, b));
       req.forEach((n, i) => {
-        if (state[i] === 'pending' && n.beat * spb + win < t) { state[i] = 'miss'; this.score?.mark(n.glyph, 'miss'); }
+        if (state[i] === 'pending' && n.beat * spb + win < t) { state[i] = 'miss'; this.mark(n, 'miss'); }
       });
       if (req.length && song.repeat && b >= song.length && b < song.length + 0.05) this.score?.clearMarks();
       if (hints && this.piano) {
@@ -133,7 +140,7 @@ class Performer {
         const nb = next.length ? next[0].beat : null;
         this.piano.setHints(nb !== null && nb - b < 1.6 ? next.filter(n => n.beat === nb) : []);
       }
-      if (this.piano && auto.length) this.piano.setLit(new Set(auto.filter(n => b >= n.beat && b < n.beat + n.dur * 0.92).map(n => n.midi)));
+      if (this.piano && auto.length) this.piano.setLit(new Set(auto.filter(n => b >= n.beat && b < n.beat + Performer.sounding(n)).map(n => n.midi)));
       if (b > endBeat + 0.15 && t > lastT) {
         const hits = state.filter(s => s === 'hit').length;
         this.stop();

@@ -352,6 +352,9 @@ b { font-weight: 800; }
 .score-svg .acc { fill: var(--ink); font-family: var(--music); }
 .score-svg .finger { font: 800 1em var(--display); }
 .score-svg .dyn { fill: var(--ink-2); font: italic 800 1em Georgia, 'Times New Roman', serif; }
+.score-svg .tie, .score-svg .slur { fill: var(--ink); stroke: var(--ink); stroke-width: 0.6; }
+.score-svg .slur { fill: var(--ink-2); stroke: var(--ink-2); }
+.score-svg .hairpin { fill: none; stroke: var(--ink-2); stroke-width: 1.6; stroke-linecap: round; }
 .score-svg .inlbl { fill: var(--ink); font-family: var(--display); font-weight: 800; pointer-events: none; }
 .score-svg .inlbl.onfill { fill: #fff; }
 .score-svg .cursor { fill: var(--gold); fill-opacity: 0.28; transition: x 0.08s linear; }
