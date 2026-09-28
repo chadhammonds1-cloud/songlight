@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Songlight</title>
+<meta name="description" content="A piano adventure: explore a silent land and wake it up, one song at a time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;700;800&family=Nunito:wght@500;700;800&family=Noto+Music&display=swap">
+<link rel="stylesheet" href="style.css">
+
+<canvas id="world" aria-label="The world of Songlight. Walk with the arrow keys, or low and high piano keys."></canvas>
+
+<div class="hud" hidden>
+  <div class="hud-left">
+    <p class="realm-level"></p>
+    <p class="realm-name"></p>
+    <div class="progress-dots" aria-label="Places awakened"></div>
+    <button class="clue-chip" title="Hear the clue again"></button>
+  </div>
+  <div class="hud-right">
+    <button class="icon-btn" id="btn-map" aria-label="World map" title="World map">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Zm0 0v14m6-12v14" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-settings" aria-label="Settings" title="Settings">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="7" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="17" r="2.2" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      <span class="midi-dot" aria-hidden="true"></span>
+    </button>
+  </div>
+</div>
+
+<div id="lumo" class="lumo" hidden role="status" aria-live="polite">
+  <div class="lumo-orb" aria-hidden="true"></div>
+  <div class="lumo-text"><p></p><div class="lumo-actions" hidden></div></div>
+  <span class="lumo-more" aria-hidden="true">▸</span>
+</div>
+
+<section id="title" class="overlay title">
+  <div class="title-inner">
+    <div class="title-orb" aria-hidden="true"></div>
+    <h1>Songlight</h1>
+    <p class="tag">A piano quest through a land that forgot its song</p>
+    <button class="btn primary big" id="btn-begin">Begin</button>
+    <p class="inputs">Play with a <b>MIDI keyboard</b>, your <b>computer keys</b>, or <b>touch</b>. Sound on!</p>
+  </div>
+</section>
+
+<section id="lesson" class="overlay lesson" hidden aria-label="Lesson">
+  <div class="sheet">
+    <header class="l-head">
+      <button class="icon-btn l-close" aria-label="Back to the world" title="Back to the world (Esc)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="l-titles"><p class="eyebrow"></p><h2 class="l-title"></h2></div>
+      <ol class="l-steps" aria-label="Lesson stages"><li data-s="learn">Learn</li><li data-s="practice">Practice</li><li data-s="perform">Perform</li></ol>
+    </header>
+    <main class="l-body"></main>
+    <footer class="l-piano"><div class="piano" id="lesson-piano"></div></footer>
+  </div>
+</section>
+
+<section id="map" class="overlay map" hidden aria-label="World map">
+  <div class="panel map-panel">
+    <header class="panel-head"><h2>The World of Songlight</h2><button class="icon-btn" data-close aria-label="Close map">✕</button></header>
+    <div class="map-body">
+      <div class="map-art"><svg id="map-svg" viewBox="0 0 1000 540" role="group" aria-label="Realms"></svg></div>
+      <div class="realm-card"></div>
+    </div>
+  </div>
+</section>
+
+<section id="settings" class="overlay settings" hidden aria-label="Settings">
+  <div class="panel settings-panel">
+    <header class="panel-head"><h2>Settings</h2><button class="icon-btn" data-close aria-label="Close settings">✕</button></header>
+    <div class="set-group">
+      <h3>Piano input</h3>
+      <p id="midi-status" class="midi-status">Not connected yet</p>
+      <button class="chip-btn" id="set-midi">Look for a MIDI keyboard</button>
+      <p class="small">Computer keys: bottom row <kbd>Z</kbd>–<kbd>/</kbd> plays C3–E4, top row <kbd>Q</kbd>–<kbd>]</kbd> plays C4–G5, and the rows above them play the black keys.</p>
+    </div>
+    <div class="set-group">
+      <h3>Keyboard labels</h3>
+      <label class="toggle"><input type="checkbox" id="set-letters"> Show note names on white keys</label>
+      <label class="toggle"><input type="checkbox" id="set-computer"> Show computer-key letters</label>
+    </div>
+    <div class="set-group">
+      <h3>How strict is a “correct” performance?</h3>
+      <div class="radio-row">
+        <label><input type="radio" name="strict" value="gentle"> Gentle <span>80% of notes</span></label>
+        <label><input type="radio" name="strict" value="standard"> Standard <span>90%, ≤2 slips</span></label>
+        <label><input type="radio" name="strict" value="strict"> Strict <span>every note</span></label>
+      </div>
+    </div>
+    <div class="set-group">
+      <h3>Volume</h3>
+      <input type="range" id="set-volume" min="0" max="100" aria-label="Volume">
+    </div>
+    <div class="set-group">
+      <button class="btn ghost danger" id="set-reset">Start over</button>
+    </div>
+  </div>
+</section>
+
+<script src="js/music.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/input.js"></script>
+<script src="js/piano.js"></script>
+<script src="js/notation.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/reward.js"></script>
+<script src="js/curriculum.js"></script>
+<script src="js/world.js"></script>
+<script src="js/lesson.js"></script>
+<script src="js/game.js"></script>
+</html>

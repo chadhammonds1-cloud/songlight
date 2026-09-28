@@ -1,0 +1,381 @@
+'use strict';
+// The quest follows the concept order of a traditional method series (Level 1A → 5).
+// Every "Original" song below was written for Songlight. "Traditional" songs are public domain.
+// Teach steps: {say, show} explain; {task: ...} must be completed before moving on.
+
+const REALM_1 = [
+  {
+    id: 'r1-1', title: 'The Singing Stone', concept: 'Finger numbers · High & low',
+    landmark: { type: 'stone', x: 450 }, reward: 'crystal', meter: 'Each true performance lights a rune on the stone.',
+    clue: 'A deep hum is coming from somewhere… On a piano, <b>low</b> sounds live to the <b>left</b>. Let\'s walk <b>left</b> and find it.',
+    clueShort: 'Follow the low hum. Low is to the left.',
+    teach: [
+      { say: 'Hear that? This old stone remembers one tiny song. To wake it, we first need to learn how to talk to the piano.' },
+      { say: 'Your fingers have <b>numbers</b>. Thumbs are <b>1</b>, pointers <b>2</b>, middles <b>3</b>, rings <b>4</b>, pinkies <b>5</b>. It\'s the same on both hands!', show: { type: 'hands' } },
+      { task: 'quiz', q: 'Wiggle finger number <b>3</b>. Which finger is it?', options: ['Thumb', 'Middle finger', 'Pinky'], answer: 1, show: { type: 'hands' } },
+      { task: 'quiz', q: 'Which finger is number <b>1</b>?', options: ['Pinky', 'Pointer', 'Thumb'], answer: 2 },
+      { say: 'Keys to the <b>left</b> sound <b>low</b>, deep like a bear. Keys to the <b>right</b> sound <b>high</b>, tiny like a bird.', show: { type: 'lowhigh' } },
+      { task: 'highlow', q: 'Listen to two notes. Was the <b>second</b> one higher or lower?', rounds: 3 },
+      { task: 'range', dir: 'low', count: 3, q: 'Play three <b>low</b> keys, way over on the left side.' },
+      { task: 'range', dir: 'high', count: 3, q: 'Now three <b>high</b> keys, over on the right!' },
+      { say: 'The stone\'s song lives on the <b>two black keys</b> in the middle. Rest right-hand fingers <b>2</b> and <b>3</b> on them.', show: { type: 'keys', keys: ['C#4', 'D#4'], fingers: [2, 3] } },
+      { say: 'Every note in this song is a <b>quarter note</b>: one steady beat each. Say "ta" for every one. Let\'s practice!', show: { type: 'values', values: ['q'] } },
+    ],
+    song: {
+      title: 'Stone Hum', by: 'Original', time: [4, 4], tempo: 80, notation: 'prestaff',
+      voices: [{ hand: 'R', notes: 'C#4:q:2 D#4:q:3 C#4:q:2 D#4:q:3 | D#4:q:3 C#4:q:2 D#4:q:3 C#4:q:2 | C#4:q:2 C#4:q:2 D#4:q:3 D#4:q:3 | C#4:q:2 D#4:q:3 C#4:q:2 C#4:q:2' }],
+    },
+    done: 'Listen! The stone is humming again. Its song bounced away to the <b>right</b>…',
+  },
+  {
+    id: 'r1-2', title: 'The Twin Pools', concept: 'Groups of 2 black keys · Half note',
+    landmark: { type: 'pools', x: 2300 }, reward: 'flower', meter: 'Each true performance opens a water lily.',
+    clue: 'The hum splashed off to the <b>right</b>. Look for a place where dark things come in <b>twos</b>.',
+    clueShort: 'Find where dark things come in twos.',
+    early: 'Two dark pools, side by side. Still and silent… for now.',
+    teach: [
+      { say: 'Look at the black keys. They come in little groups: groups of <b>two</b> and groups of <b>three</b>, all the way up and down.', show: { type: 'groups' } },
+      { task: 'tap', q: 'Find <b>every</b> group of two black keys. Play both keys in each group!', targets: ['C#3', 'D#3', 'C#4', 'D#4', 'C#5', 'D#5'] },
+      { say: 'A new note: the <b>half note</b>. It\'s hollow, and it lasts <b>two</b> beats. Count "1 – 2" while you hold it down.', show: { type: 'values', values: ['q', 'h'] } },
+      { task: 'quiz', q: 'How many beats does a half note get?', options: ['1', '2', '4'], answer: 1 },
+      { task: 'rhythm', q: 'Tap along with the beat! Tap once for each note and <b>hold</b> the half notes.', rhythm: 'q q h | q q h', time: [4, 4], tempo: 72 },
+      { say: 'This song takes turns between hands. Your <b>left</b> hand plays the lower group with fingers <b>3</b> and <b>2</b>.', show: { type: 'keys', keys: ['C#3', 'D#3', 'C#4', 'D#4'], fingers: [3, 2, 2, 3], hands: ['L', 'L', 'R', 'R'] } },
+    ],
+    song: {
+      title: 'Twin Pools', by: 'Original', time: [4, 4], tempo: 84, notation: 'prestaff',
+      voices: [{ hand: 'R', notes: 'C#3:q:L3 D#3:q:L2 C#3:h:L3 | C#4:q:2 D#4:q:3 C#4:h:2 | D#3:q:L2 C#3:q:L3 D#3:h:L2 | D#4:q:3 C#4:q:2 C#4:h:2' }],
+    },
+    done: 'The pools are glowing! Their ripples came in twos… but something up ahead is counting in <b>threes</b>.',
+  },
+  {
+    id: 'r1-3', title: 'Three Lanterns', concept: 'Groups of 3 black keys · Whole note',
+    landmark: { type: 'lanterns', x: 3050 }, reward: 'lanterns', meter: 'Each true performance lights a lantern.',
+    clue: 'Something ahead is counting: <b>one, two, three</b>. Find where dark things come in <b>threes</b>.',
+    clueShort: 'Find where dark things come in threes.',
+    early: 'Three lanterns stand in a row, cold and dark.',
+    teach: [
+      { say: 'Now the groups of <b>three</b> black keys. Your right hand fits them perfectly with fingers <b>2 – 3 – 4</b>.', show: { type: 'keys', keys: ['F#4', 'G#4', 'A#4'], fingers: [2, 3, 4] } },
+      { task: 'tap', q: 'Play every key in <b>every</b> group of three black keys!', targets: ['F#3', 'G#3', 'A#3', 'F#4', 'G#4', 'A#4', 'F#5', 'G#5', 'A#5'] },
+      { say: 'The <b>whole note</b> is round and hollow, with no stem. Hold it for <b>four</b> beats: "1 – 2 – 3 – 4".', show: { type: 'values', values: ['q', 'h', 'w'] } },
+      { task: 'quiz', q: 'Which note lasts the <b>longest</b>?', options: ['♩ quarter', '𝅗𝅥 half', '𝅝 whole'], answer: 2 },
+      { task: 'rhythm', q: 'Tap and hold: quarter, quarter, half… then one long whole note.', rhythm: 'q q h | w', time: [4, 4], tempo: 72 },
+      { say: 'Your left hand uses fingers <b>4 – 3 – 2</b> on the lower group of three.', show: { type: 'keys', keys: ['F#3', 'G#3', 'A#3'], fingers: [4, 3, 2], hands: ['L', 'L', 'L'] } },
+    ],
+    song: {
+      title: 'Lantern Light', by: 'Original', time: [4, 4], tempo: 84, notation: 'prestaff',
+      voices: [{ hand: 'R', notes: 'F#4:q:2 G#4:q:3 A#4:h:4 | A#4:q:4 G#4:q:3 F#4:h:2 | F#3:q:L4 G#3:q:L3 A#3:h:L2 | A#3:q:L2 G#3:q:L3 F#3:h:L4 | F#4:q:2 G#4:q:3 A#4:q:4 G#4:q:3 | F#4:w:2' }],
+    },
+    done: 'Three warm lights! And look, the cottage ahead has a sign with <b>letters</b> on it.',
+  },
+  {
+    id: 'r1-4', title: 'The CAFE Door', concept: 'The musical alphabet · C D E',
+    landmark: { type: 'cottage', x: 3800 }, reward: 'door', meter: 'Each true performance opens the door a little wider.',
+    clue: 'The next house has a word on its sign. Music uses only <b>seven letters</b>: A B C D E F G. Find the sign spelled with <b>only music letters</b>.',
+    clueShort: 'Find a sign spelled only with music letters (A to G).',
+    early: 'A little cottage with a sign: C A F E. Hmm… every one of those is a music letter!',
+    teach: [
+      { say: 'White keys are named with the <b>musical alphabet</b>: A B C D E F G. Then it starts over with A again!', show: { type: 'letters' } },
+      { task: 'quiz', q: 'What comes after <b>G</b> in the musical alphabet?', options: ['H', 'A', 'C'], answer: 1 },
+      { say: '<b>C</b> sits just <b>left</b> of every group of two black keys. <b>D</b> is snuggled in the middle. <b>E</b> is on the right.', show: { type: 'keys', keys: ['C4', 'D4', 'E4'] } },
+      { task: 'tap', q: 'Find three <b>C</b>s. Look left of the two black keys!', targets: ['C3', 'C4', 'C5'] },
+      { task: 'tap', q: 'Now find three <b>E</b>s.', targets: ['E3', 'E4', 'E5'] },
+      { task: 'quiz', q: 'Which word can you spell with music letters?', options: ['DOG', 'BAG', 'CAT'], answer: 1 },
+      { say: 'The C in the very middle is <b>Middle C</b>. Right hand: thumb <b>1</b> on Middle C, then <b>2</b> on D, <b>3</b> on E. Left hand: fingers <b>3 – 2 – 1</b> on the C D E below.', show: { type: 'keys', keys: ['C3', 'D3', 'E3', 'C4', 'D4', 'E4'], fingers: [3, 2, 1, 1, 2, 3], hands: ['L', 'L', 'L', 'R', 'R', 'R'] } },
+    ],
+    song: {
+      title: 'Café Morning', by: 'Original', time: [4, 4], tempo: 88, notation: 'prestaff', labels: 'letters',
+      voices: [{ hand: 'R', notes: 'C4:q:1 D4:q:2 E4:h:3 | E4:q:3 D4:q:2 C4:h:1 | C3:q:L3 D3:q:L2 E3:h:L1 | E3:q:L1 D3:q:L2 C3:h:L3 | C4:q:1 E4:q:3 D4:q:2 E4:q:3 | C4:w:1' }],
+    },
+    done: 'The café is warm again. Did you notice? Its name was music all along: <b>C-A-F-E</b>!',
+  },
+  {
+    id: 'r1-5', title: 'The Gate of F', concept: 'F G A B · Right-hand C Position',
+    landmark: { type: 'gate', x: 4550, letter: 'F' }, reward: 'door', meter: 'Each true performance lifts the gate a little higher.',
+    clue: 'Past the café is a gate marked with one letter: the letter that comes just <b>before G</b>.',
+    clueShort: 'Find the gate marked with the letter before G.',
+    early: 'A tall gate with a big letter F on its banner. It\'s locked tight.',
+    teach: [
+      { say: '<b>F</b> sits just left of every group of three black keys. Then come <b>G</b>, <b>A</b>, and <b>B</b>.', show: { type: 'keys', keys: ['F4', 'G4', 'A4', 'B4'] } },
+      { task: 'tap', q: 'Find three <b>F</b>s.', targets: ['F3', 'F4', 'F5'] },
+      { task: 'tap', q: 'And three <b>B</b>s, just right of the three black keys.', targets: ['B3', 'B4', 'B5'] },
+      { say: 'Now for <b>C Position</b>! Right thumb on Middle C, then one finger on each white key: C D E F G.', show: { type: 'keys', keys: ['C4', 'D4', 'E4', 'F4', 'G4'], fingers: [1, 2, 3, 4, 5] } },
+      { task: 'tap', order: true, hint: true, q: 'Play C D E F G going up, one finger each: <b>1 2 3 4 5</b>.', targets: ['C4', 'D4', 'E4', 'F4', 'G4'], fingers: [1, 2, 3, 4, 5] },
+      { task: 'quiz', q: 'In C Position, which finger plays <b>G</b>?', options: ['3', '4', '5'], answer: 2 },
+    ],
+    song: {
+      title: 'The Opening Gate', by: 'Original', time: [4, 4], tempo: 88, notation: 'prestaff', labels: 'letters',
+      voices: [{ hand: 'R', notes: 'C4:q:1 D4:q:2 E4:q:3 F4:q:4 | G4:h:5 F4:h:4 | E4:q:3 D4:q:2 E4:q:3 F4:q:4 | G4:w:5 | G4:q:5 F4:q:4 E4:q:3 D4:q:2 | C4:h:1 E4:h:3 | D4:q:2 E4:q:3 D4:h:2 | C4:w:1' }],
+    },
+    done: 'The gate swings open! Beyond it the water is so still it\'s like a <b>mirror</b>.',
+  },
+  {
+    id: 'r1-6', title: 'Mirror Lake', concept: 'Left-hand C Position',
+    landmark: { type: 'lake', x: 5300 }, reward: 'flower', meter: 'Each true performance opens a lotus on the lake.',
+    clue: 'Your <b>left hand</b> wants a turn! Find the water that shows your <b>reflection</b>.',
+    clueShort: 'Find the water that shows your reflection.',
+    early: 'A lake as smooth as glass. You can almost see yourself in it.',
+    teach: [
+      { say: 'Left-hand <b>C Position</b>: pinky <b>5</b> on the C <b>below</b> Middle C, then <b>4 3 2 1</b> on D E F G.', show: { type: 'keys', keys: ['C3', 'D3', 'E3', 'F3', 'G3'], fingers: [5, 4, 3, 2, 1], hands: ['L', 'L', 'L', 'L', 'L'] } },
+      { task: 'tap', order: true, hint: true, hand: 'L', q: 'Play C D E F G with your left hand: <b>5 4 3 2 1</b>.', targets: ['C3', 'D3', 'E3', 'F3', 'G3'], fingers: [5, 4, 3, 2, 1] },
+      { task: 'quiz', q: 'In left-hand C Position, which finger plays <b>C</b>?', options: ['1', '3', '5'], answer: 2 },
+      { say: 'Your hands are reflections of each other: the <b>thumbs</b> face each other in the middle, and the pinkies are on the outside.', show: { type: 'keys', keys: ['C3', 'D3', 'E3', 'F3', 'G3', 'C4', 'D4', 'E4', 'F4', 'G4'], fingers: [5, 4, 3, 2, 1, 1, 2, 3, 4, 5], hands: ['L', 'L', 'L', 'L', 'L', 'R', 'R', 'R', 'R', 'R'] } },
+    ],
+    song: {
+      title: 'Reflections', by: 'Original', time: [4, 4], tempo: 88, notation: 'prestaff', labels: 'letters',
+      voices: [{ hand: 'R', notes: 'E4:q:3 F4:q:4 G4:h:5 | E3:q:L3 F3:q:L2 G3:h:L1 | G4:q:5 F4:q:4 E4:h:3 | G3:q:L1 F3:q:L2 E3:h:L3 | D4:q:2 E4:q:3 F4:q:4 D4:q:2 | D3:q:L4 E3:q:L3 F3:q:L2 D3:q:L4 | C4:w:1 | C3:w:L5' }],
+    },
+    done: 'The lake shimmers with your song. But look, a <b>drawbridge</b> blocks the path ahead.',
+  },
+  {
+    id: 'r1-7', title: 'The Drawbridge', concept: 'Measures · Bar lines · 4/4 time',
+    landmark: { type: 'bridge', x: 6100 }, reward: 'bridge', meter: 'Each true performance turns the chain and lowers the bridge.',
+    clue: 'A drawbridge blocks the way. Its chains only turn when music is <b>counted</b> just right.',
+    clueShort: 'Find the drawbridge. It needs careful counting.',
+    early: 'A drawbridge, pulled up high. The chains won\'t budge.',
+    teach: [
+      { say: 'Music is split into <b>measures</b> by <b>bar lines</b>. A <b>double bar</b> at the very end means "the end!"', show: { type: 'score', song: { time: [4, 4], notation: 'prestaff', voices: [{ hand: 'R', notes: 'C4:q C4:q C4:h | E4:h E4:h | G4:w' }] } } },
+      { say: 'The <b>time signature</b> sits at the start. <b>4/4</b> means <b>4 beats</b> in every measure. The top number counts the beats.', show: { type: 'timesig', top: 4, bottom: 4 } },
+      { task: 'quiz', q: 'A 4/4 measure already has one half note. How many more beats fill it up?', options: ['1', '2', '3'], answer: 1 },
+      { task: 'quiz', q: 'Which group fills exactly one 4/4 measure?', options: ['♩ ♩ ♩', '𝅗𝅥 ♩ ♩', '𝅗𝅥 𝅗𝅥 ♩'], answer: 1 },
+      { task: 'rhythm', q: 'Count out loud (1, 2, 3, 4) and tap!', rhythm: 'q q h | h h | q q q q | w', time: [4, 4], tempo: 76 },
+    ],
+    song: {
+      title: 'Chain and Gear', by: 'Original', time: [4, 4], tempo: 88, notation: 'prestaff', labels: 'letters',
+      voices: [{ hand: 'R', notes: 'C4:q:1 C4:q:1 G4:h:5 | E4:q:3 F4:q:4 G4:h:5 | C3:q:L5 C3:q:L5 G3:h:L1 | E3:q:L3 D3:q:L4 C3:h:L5 | G4:h:5 F4:h:4 | E4:q:3 D4:q:2 C4:h:1 | G3:w:L1 | C4:w:1' }],
+    },
+    done: 'Clank… clank… CLUNK! The bridge is down. Across it, a tower points at the sky.',
+  },
+  {
+    id: 'r1-8', title: 'The Star Tower', concept: 'The staff · Treble & bass clefs · Middle C Position',
+    landmark: { type: 'tower', x: 6900 }, reward: 'stars', meter: 'Each true performance wakes a star.',
+    clue: 'Cross the bridge. Up ahead, a tower watches the sky, and its stars sit on <b>five lines</b>.',
+    clueShort: 'Find the tower whose stars sit on five lines.',
+    early: 'A stargazing tower. Its dome is shut tight.',
+    teach: [
+      { say: 'Music is written on a <b>staff</b>: <b>5 lines</b> and <b>4 spaces</b>. Each note sits <b>on</b> a line or <b>in</b> a space.', show: { type: 'score', song: { time: [4, 4], notation: 'staff', voices: [{ hand: 'R', notes: 'E4:q F4:q G4:q A4:q | B4:q C5:q D5:q E5:q' }] } } },
+      { say: 'When notes climb <b>up</b> the staff, they sound <b>higher</b>, moving to the <b>right</b> on the piano. Listen!', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 100, notation: 'staff', voices: [{ hand: 'R', notes: 'C4:q D4:q E4:q F4:q | G4:q A4:q B4:q C5:q' }] } } },
+      { say: 'The <b>treble clef</b> 𝄞 is for higher notes, usually the right hand. The <b>bass clef</b> 𝄢 is for lower notes, usually the left. Together they make the <b>grand staff</b>.', show: { type: 'score', song: { time: [4, 4], notation: 'staff', voices: [{ hand: 'R', notes: 'G4:w | r:w' }, { hand: 'L', notes: 'r:w | F3:w' }] } } },
+      { say: '<b>Middle C</b> sits on its own short line, a <b>ledger line</b>, between the two staffs. It can belong to either hand.', show: { type: 'score', song: { time: [4, 4], notation: 'staff', voices: [{ hand: 'R', notes: 'C4:w | r:w' }, { hand: 'L', notes: 'r:w | C4:w' }] } } },
+      { task: 'read', q: 'Read each note, then play it!', notes: [['C4', 'R'], ['D4', 'R'], ['E4', 'R'], ['B3', 'L'], ['A3', 'L'], ['C4', 'L']] },
+      { say: '<b>Middle C Position</b>: <b>both thumbs</b> share Middle C! Right hand plays C D E F G going up. Left hand plays C B A G F going down.', show: { type: 'keys', keys: ['F3', 'G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F4', 'G4'], fingers: [5, 4, 3, 2, 1, 2, 3, 4, 5], hands: ['L', 'L', 'L', 'L', 'R', 'R', 'R', 'R', 'R'] } },
+    ],
+    song: {
+      title: 'Starlight Watch', by: 'Original', time: [4, 4], tempo: 84, notation: 'staff',
+      voices: [{ hand: 'R', notes: 'C4:q:1 D4:q:2 E4:q:3 F4:q:4 | G4:h:5 E4:h:3 | C4:q:L1 B3:q:L2 A3:q:L3 G3:q:L4 | F3:h:L5 A3:h:L3 | E4:q:3 D4:q:2 C4:h:1 | B3:q:L2 A3:q:L3 B3:h:L2 | D4:q:2 E4:q:3 D4:q:2 B3:q:L2 | C4:w:1' }],
+    },
+    done: 'The dome opens and the stars spill out! Down the hill, tiny lights are blinking… one-two-three, one-two-three.',
+  },
+  {
+    id: 'r1-9', title: 'Firefly Glade', concept: '3/4 time · Dotted half note',
+    landmark: { type: 'glade', x: 7700 }, reward: 'lanterns', meter: 'Each true performance wakes a firefly lantern.',
+    clue: 'Tiny lights are dancing a <b>waltz</b>: <b>ONE</b>-two-three, <b>ONE</b>-two-three. Follow them!',
+    clueShort: 'Follow the lights dancing in threes.',
+    early: 'A quiet glade. A few sleepy fireflies blink… in threes?',
+    teach: [
+      { say: 'Some music counts in <b>threes</b>. The time signature <b>3/4</b> means <b>3 beats</b> in every measure. It feels like a dance!', show: { type: 'timesig', top: 3, bottom: 4 } },
+      { say: 'A <b>dot</b> after a note makes it longer. A <b>dotted half note</b> lasts <b>3 beats</b>: two for the half note, plus one for the dot.', show: { type: 'values', values: ['h', 'h.'] } },
+      { task: 'quiz', q: 'How many beats does a <b>dotted half note</b> get?', options: ['2', '3', '4'], answer: 1 },
+      { task: 'quiz', q: 'In <b>3/4</b> time, how many beats are in each measure?', options: ['2', '3', '4'], answer: 1 },
+      { task: 'rhythm', q: 'Waltz time! Count 1-2-3 and tap.', rhythm: 'q q q | h. | h q | h.', time: [3, 4], tempo: 92 },
+    ],
+    song: {
+      title: 'Firefly Waltz', by: 'Original', time: [3, 4], tempo: 104, notation: 'staff',
+      voices: [{ hand: 'R', notes: 'C4:q:1 E4:q:3 G4:q:5 | G4:h.:5 | F4:q:4 E4:q:3 D4:q:2 | E4:h.:3 | C3:q:L5 E3:q:L3 G3:q:L1 | G3:h.:L1 | F4:q:4 E4:q:3 D4:q:2 | C4:h.:1' }],
+    },
+    done: 'The glade is spinning with fireflies! Up ahead, the cliffs rise high. I bet they <b>echo</b>.',
+  },
+  {
+    id: 'r1-10', title: 'Echo Canyon', concept: 'Dynamics: f and p · Repeat sign',
+    landmark: { type: 'canyon', x: 8500 }, reward: 'crystal', meter: 'Each true performance wakes an echo in the rock.',
+    clue: 'Somewhere ahead, the land <b>answers back</b>. Find the canyon of echoes.',
+    clueShort: 'Find the place that answers back.',
+    early: 'Two tall rocks. "Hello?" …Nothing echoes back. Not yet.',
+    teach: [
+      { say: 'Music can be <b>loud</b> or <b>soft</b>. These are called <b>dynamics</b>. <b><i>f</i></b> (forte) means <b>loud</b>. <b><i>p</i></b> (piano) means <b>soft</b>.' },
+      { say: 'Here\'s a secret: the piano\'s full name is the <b>pianoforte</b>, the "soft-loud"! It can do both, depending on how hard you press.' },
+      { task: 'quiz', q: 'What does <b><i>p</i></b> mean?', options: ['Soft', 'Loud', 'Play fast'], answer: 0 },
+      { task: 'dyn', q: 'Play a <b>loud</b> note (<i>f</i>), then a <b>soft</b> echo (<i>p</i>).' },
+      { say: 'Two dots before a double bar make a <b>repeat sign</b>. It means: go back to the beginning and play it all <b>again</b>!', show: { type: 'score', song: { time: [4, 4], notation: 'staff', repeat: true, voices: [{ hand: 'R', notes: 'G4:q E4:q G4:h | C4:w' }] } } },
+      { task: 'quiz', q: 'When you see a repeat sign at the end, you…', options: ['Stop', 'Play it again', 'Play faster'], answer: 1 },
+    ],
+    song: {
+      title: 'Canyon Echo', by: 'Original', time: [4, 4], tempo: 92, notation: 'staff', repeat: true,
+      voices: [{ hand: 'R', notes: 'G4:q:5:f E4:q:3 G4:h:5 | G4:q:5:p E4:q:3 G4:h:5 | F4:q:4:f D4:q:2 F4:h:4 | F4:q:4:p D4:q:2 F4:h:4 | E4:q:3:f C4:q:1 E4:q:3 G4:q:5 | C4:w:1:p' }],
+    },
+    done: 'Echo… echo… echo! Up the hill are stone stairs, some close together and some far apart.',
+  },
+  {
+    id: 'r1-11', title: 'The Stepping Stair', concept: 'Steps (2nds) & skips (3rds)',
+    landmark: { type: 'stairs', x: 9300 }, reward: 'stars', meter: 'Each true performance lights a stair.',
+    clue: 'Climb toward the hilltop. Look for the <b>stairs</b>: some stones sit right next to each other, and some <b>skip</b>.',
+    clueShort: 'Find the stairs that step and skip.',
+    early: 'Old stone stairs climbing the hill.',
+    teach: [
+      { say: 'A <b>step</b> moves to the very next key. On the staff it goes line → space or space → line. It\'s also called a <b>2nd</b>.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 90, notation: 'staff', voices: [{ hand: 'R', notes: 'C4:h D4:h | E4:h F4:h' }] } } },
+      { say: 'A <b>skip</b> jumps over one key. On the staff it goes line → line or space → space. It\'s also called a <b>3rd</b>.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 90, notation: 'staff', voices: [{ hand: 'R', notes: 'C4:h E4:h | D4:h F4:h' }] } } },
+      { task: 'interval', q: 'Step or skip?', pairs: [['E4', 'F4', 'step'], ['C4', 'E4', 'skip'], ['G4', 'E4', 'skip'], ['D4', 'C4', 'step']] },
+      { task: 'tap', order: true, hint: true, q: 'Skip up the stairs: C, E, G with fingers <b>1 3 5</b>.', targets: ['C4', 'E4', 'G4'], fingers: [1, 3, 5] },
+    ],
+    song: {
+      title: 'Stepping Stones', by: 'Original', time: [4, 4], tempo: 88, notation: 'staff',
+      voices: [{ hand: 'R', notes: 'C4:q:1 E4:q:3 G4:h:5 | F4:q:4 E4:q:3 D4:h:2 | C3:q:L5 E3:q:L3 G3:h:L1 | F3:q:L2 E3:q:L3 D3:h:L4 | E4:q:3 G4:q:5 F4:q:4 D4:q:2 | E4:q:3 C4:q:1 D4:h:2 | E3:q:L3 D3:q:L4 E3:q:L3 D3:q:L4 | C4:w:1' }],
+    },
+    done: 'The stairs glow all the way to the top… and there it is. <b>The Heart Crystal.</b>',
+  },
+  {
+    id: 'r1-12', title: 'The Heart Crystal', concept: 'Hands together',
+    landmark: { type: 'crystal', x: 10100 }, reward: 'crystal', meter: 'Each true performance fills the Heart Crystal with light.',
+    clue: 'Everything you\'ve woken is humming toward the <b>top of the hill</b>. The Heart Crystal is waiting.',
+    clueShort: 'Climb to the Heart Crystal at the top of the hill.',
+    early: 'A great crystal, dark and cold. It needs a real song, played with both hands.',
+    teach: [
+      { say: 'Until now your hands took turns. Now they\'ll play <b>together</b>! When notes line up one above the other, play them at the <b>same time</b>.', show: { type: 'score', song: { time: [4, 4], notation: 'staff', voices: [{ hand: 'R', notes: 'E4:w' }, { hand: 'L', notes: 'C3:w' }] } } },
+      { task: 'together', q: 'Play left-hand <b>C</b> and right-hand <b>E</b> at the <b>same time</b>. Do it three times!', notes: ['C3', 'E4'], count: 3 },
+      { say: 'In this song your left hand holds long <b>whole notes</b> on C and G while your right hand sings the tune.', show: { type: 'keys', keys: ['C3', 'G3', 'C4', 'D4', 'E4', 'G4'], fingers: [5, 1, 1, 2, 3, 5], hands: ['L', 'L', 'R', 'R', 'R', 'R'] } },
+      { say: 'This is a real song that children have sung for almost 200 years: <b>Mary Had a Little Lamb</b>! Try each hand alone first, then together.' },
+    ],
+    song: {
+      title: 'Mary Had a Little Lamb', by: 'Traditional', time: [4, 4], tempo: 92, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'E4:q:3 D4:q:2 C4:q:1 D4:q:2 | E4:q:3 E4:q:3 E4:h:3 | D4:q:2 D4:q:2 D4:h:2 | E4:q:3 G4:q:5 G4:h:5 | E4:q:3 D4:q:2 C4:q:1 D4:q:2 | E4:q:3 E4:q:3 E4:q:3 E4:q:3 | D4:q:2 D4:q:2 E4:q:3 D4:q:2 | C4:w:1' },
+        { hand: 'L', notes: 'C3:w:5 | C3:w:5 | G3:w:1 | C3:w:5 | C3:w:5 | C3:w:5 | G3:w:1 | C3:w:5' },
+      ],
+    },
+    done: 'The Heart Crystal is <b>blazing</b>! The whole meadow is singing. Look at the map: the mist over <b>Whisperwood</b> is lifting.',
+  },
+];
+
+const REALM_2 = [
+  {
+    id: 'r2-1', title: 'The Bell Tree', concept: 'G Position',
+    landmark: { type: 'belltree', x: 900 }, reward: 'lanterns', meter: 'Each true performance wakes a bell.',
+    clue: 'Whisperwood is so quiet. Listen for <b>bells</b>. They hang from the tallest tree.',
+    clueShort: 'Find the tree hung with bells.',
+    teach: [
+      { say: 'Hands can move to new homes! In <b>G Position</b>, the right thumb sits on the G just above Middle C: <b>G A B C D</b>.', show: { type: 'keys', keys: ['G4', 'A4', 'B4', 'C5', 'D5'], fingers: [1, 2, 3, 4, 5] } },
+      { task: 'tap', order: true, hint: true, q: 'Play G A B C D with your right hand: <b>1 2 3 4 5</b>.', targets: ['G4', 'A4', 'B4', 'C5', 'D5'], fingers: [1, 2, 3, 4, 5] },
+      { say: 'Left-hand G Position: pinky on the <b>low G</b>, then A B C D with <b>4 3 2 1</b>.', show: { type: 'keys', keys: ['G2', 'A2', 'B2', 'C3', 'D3'], fingers: [5, 4, 3, 2, 1], hands: ['L', 'L', 'L', 'L', 'L'] } },
+      { task: 'tap', order: true, hint: true, hand: 'L', q: 'Play G A B C D with your left hand: <b>5 4 3 2 1</b>.', targets: ['G2', 'A2', 'B2', 'C3', 'D3'], fingers: [5, 4, 3, 2, 1] },
+      { task: 'quiz', q: 'In right-hand G Position, which finger plays <b>D</b>?', options: ['3', '4', '5'], answer: 2 },
+      { task: 'read', q: 'Read each note in G Position, then play it!', notes: [['G4', 'R'], ['B4', 'R'], ['D5', 'R'], ['G2', 'L'], ['B2', 'L']] },
+    ],
+    song: {
+      title: 'Morning Bells', by: 'Original', time: [4, 4], tempo: 92, notation: 'staff',
+      voices: [{ hand: 'R', notes: 'G4:q:1 B4:q:3 D5:h:5 | C5:q:4 B4:q:3 A4:h:2 | G2:q:L5 B2:q:L3 D3:h:L1 | C3:q:L2 B2:q:L3 A2:h:L4 | B4:q:3 A4:q:2 G4:q:1 A4:q:2 | B4:h:3 A4:h:2 | D3:q:L1 C3:q:L2 B2:q:L3 A2:q:L4 | G2:w:L5' }],
+    },
+    done: 'Ding… ding… The bells are ringing through the trees! I can hear something grand coming from the <b>hall of columns</b>.',
+  },
+  {
+    id: 'r2-2', title: 'The Hall of Joy', concept: 'Hands together in G Position',
+    landmark: { type: 'hall', x: 1700 }, reward: 'door', meter: 'Each true performance opens the great hall doors.',
+    clue: 'Long ago, a composer named Beethoven wrote a song of <b>joy</b> that the whole world still sings. Find the <b>hall of columns</b>.',
+    clueShort: 'Find the hall of columns.',
+    early: 'A hall with tall stone columns. Its doors are sealed.',
+    teach: [
+      { say: 'Ludwig van Beethoven wrote this melody more than 200 years ago. It\'s called <b>Ode to Joy</b>.' },
+      { say: 'Right hand in G Position plays the melody. Left hand in G Position holds low <b>G</b> and <b>D</b> as whole and half notes.', show: { type: 'keys', keys: ['G2', 'D3', 'G4', 'A4', 'B4', 'C5', 'D5'], fingers: [5, 1, 1, 2, 3, 4, 5], hands: ['L', 'L', 'R', 'R', 'R', 'R', 'R'] } },
+      { task: 'together', q: 'Play low <b>G</b> (left) and <b>B</b> (right) at the same time, three times.', notes: ['G2', 'B4'], count: 3 },
+      { task: 'quiz', q: 'Notes that line up one above the other are played…', options: ['One after another', 'At the same time', 'Only by the left hand'], answer: 1 },
+    ],
+    song: {
+      title: 'Ode to Joy', by: 'Ludwig van Beethoven (1824)', time: [4, 4], tempo: 96, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'B4:q:3 B4:q:3 C5:q:4 D5:q:5 | D5:q:5 C5:q:4 B4:q:3 A4:q:2 | G4:q:1 G4:q:1 A4:q:2 B4:q:3 | B4:q:3 A4:q:2 A4:h:2 | B4:q:3 B4:q:3 C5:q:4 D5:q:5 | D5:q:5 C5:q:4 B4:q:3 A4:q:2 | G4:q:1 G4:q:1 A4:q:2 B4:q:3 | A4:q:2 G4:q:1 G4:h:1' },
+        { hand: 'L', notes: 'G2:w:5 | D3:w:1 | G2:w:5 | D3:w:1 | G2:w:5 | D3:w:1 | G2:w:5 | D3:h:1 G2:h:5' },
+      ],
+    },
+    done: 'The hall is ringing with joy! Feel that breeze? It\'s blowing a little… <b>sharp</b>.',
+  },
+  {
+    id: 'r2-3', title: 'The Sharp Wind', concept: 'Sharps ♯ and flats ♭',
+    landmark: { type: 'windmill', x: 2500 }, reward: 'flower', meter: 'Each true performance turns the windmill sails.',
+    clue: 'Feel that wind? It\'s blowing a little <b>sharp</b>. Find the thing the wind turns.',
+    clueShort: 'Find what the wind turns.',
+    early: 'A windmill with still sails. The air is calm here.',
+    teach: [
+      { say: 'A <b>sharp</b> ♯ means: play the very next key to the <b>right</b>, a little higher. It\'s usually a black key.', show: { type: 'keys', keys: ['F4', 'F#4'] } },
+      { task: 'tap', q: 'Play <b>F♯</b>, the black key just right of F. Find three of them!', targets: ['F#3', 'F#4', 'F#5'] },
+      { say: 'A <b>flat</b> ♭ means: play the very next key to the <b>left</b>, a little lower.', show: { type: 'keys', keys: ['B4', 'Bb4'] } },
+      { task: 'tap', q: 'Find two <b>B♭</b>s, the black key just left of B.', targets: ['Bb3', 'Bb4'] },
+      { task: 'quiz', q: 'A sharp ♯ moves you…', options: ['Right, a little higher', 'Left, a little lower', 'Nowhere at all'], answer: 0 },
+      { task: 'read', q: 'Read each note, sharps and flats too!', notes: [['F#4', 'R'], ['Bb4', 'R'], ['C#4', 'R']] },
+    ],
+    song: {
+      title: 'The Sharp Wind', by: 'Original', time: [4, 4], tempo: 92, notation: 'staff',
+      voices: [{ hand: 'R', notes: 'C4:q:1 D4:q:2 E4:q:3 F#4:q:4 | G4:h:5 G4:h:5 | G4:q:5 F#4:q:4 E4:q:3 D4:q:2 | E4:h:3 F#4:h:4 | G4:q:5 F#4:q:4 G4:q:5 E4:q:3 | D4:q:2 E4:q:3 F#4:h:4 | G4:w:5' }],
+    },
+    done: 'Whoosh! The sails are spinning. At the edge of the wood hangs an arch of <b>bells</b>… covered in snow.',
+  },
+  {
+    id: 'r2-4', title: 'The Winter Arch', concept: 'Hands together, a longer song',
+    landmark: { type: 'bellarch', x: 3300 }, reward: 'stars', meter: 'Each true performance rings the winter bells.',
+    clue: 'At the edge of Whisperwood stands a snowy <b>arch of bells</b>. Let\'s ring them all!',
+    clueShort: 'Find the snowy arch of bells.',
+    early: 'An arch hung with frozen bells.',
+    teach: [
+      { say: 'Here\'s a winter favorite from 1857: <b>Jingle Bells</b>! Your right hand plays the tune in <b>C Position</b>.' },
+      { say: 'Your left hand plays whole notes on <b>C</b>, <b>F</b> and <b>G</b>. Watch for when it moves!', show: { type: 'keys', keys: ['C3', 'F3', 'G3'], fingers: [5, 2, 1], hands: ['L', 'L', 'L'] } },
+      { task: 'rhythm', q: 'Tap the jingle rhythm!', rhythm: 'q q h | q q h | q q q q | w', time: [4, 4], tempo: 92 },
+    ],
+    song: {
+      title: 'Jingle Bells', by: 'James Lord Pierpont (1857)', time: [4, 4], tempo: 100, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'E4:q:3 E4:q:3 E4:h:3 | E4:q:3 E4:q:3 E4:h:3 | E4:q:3 G4:q:5 C4:q:1 D4:q:2 | E4:w:3 | F4:q:4 F4:q:4 F4:q:4 F4:q:4 | F4:q:4 E4:q:3 E4:q:3 E4:q:3 | E4:q:3 D4:q:2 D4:q:2 E4:q:3 | D4:h:2 G4:h:5' },
+        { hand: 'L', notes: 'C3:w:5 | C3:w:5 | C3:w:5 | C3:w:5 | F3:w:2 | C3:w:5 | G3:w:1 | G3:w:1' },
+      ],
+    },
+    done: 'Jingle, jingle! Whisperwood is wide awake. The path beyond is still forming… more songs are on the way.',
+  },
+];
+
+const CURRICULUM = {
+  realms: [
+    {
+      id: 'meadow', name: 'The Hushed Meadow', level: 'Level 1A', decor: 'meadow', length: 10600, start: 1500,
+      palette: {
+        silent: { skyTop: '#8f8aa9', skyBot: '#d8d2df', far: '#aaa6bc', mid: '#9ca79f', near: '#7e8e85', ground: '#6c7b71', fog: '#d8d2df' },
+        awake: { skyTop: '#3d8bff', skyBot: '#ffd3a1', far: '#8c7cf0', mid: '#39c18e', near: '#1f9e6e', ground: '#15875a', fog: '#fff1dc' },
+      },
+      intro: [
+        '…Oh! You\'re awake! Hello. I\'m <b>Lumo</b>.',
+        'This is the <b>Hushed Meadow</b>. Long ago, the Great Song that kept this land alive broke into pieces, and everything fell silent.',
+        'But music can wake it up. Every song you play brings a little piece of it back. Walk with <b>← →</b>, or play <b>low</b> keys to go left and <b>high</b> keys to go right. Press <b>↑</b> or <b>Middle C</b> to look closer.',
+      ],
+      lessons: REALM_1,
+    },
+    {
+      id: 'wood', name: 'Whisperwood', level: 'Level 1B', decor: 'wood', length: 4300, start: 250,
+      palette: {
+        silent: { skyTop: '#7f8ea0', skyBot: '#cdd6d8', far: '#96a3ad', mid: '#7f948d', near: '#687d74', ground: '#5c6f66', fog: '#cdd6d8' },
+        awake: { skyTop: '#1f6fd1', skyBot: '#ffc9e0', far: '#6a5cd6', mid: '#17a38a', near: '#0f7f6a', ground: '#0c6b58', fog: '#ffe9f2' },
+      },
+      intro: [
+        'Welcome to <b>Whisperwood</b>. These trees are very, very old.',
+        'They remember songs from long ago, songs people still sing today. Let\'s wake them.',
+      ],
+      lessons: REALM_2,
+      planned: ['Melodic & harmonic intervals (2nds–5ths)', 'Legato & staccato', 'Ties', 'Eighth notes', 'Crescendo & diminuendo', 'C and G7 chords'],
+      plannedSongs: ['Lightly Row', 'When the Saints Go Marching In', 'Aura Lee'],
+    },
+    {
+      id: 'caverns', name: 'Crystal Caverns', level: 'Level 2', lessons: [],
+      planned: ['C and G major scales', 'Dotted quarter notes', 'Eighth notes in pairs', 'Primary chords I, IV, V7', 'F Position', 'Pickup notes', 'Damper pedal'],
+      plannedSongs: ['Happy Birthday', 'She\'ll Be Coming Round the Mountain', 'Yankee Doodle', 'London Bridge', 'Oh! Susanna'],
+    },
+    {
+      id: 'harbor', name: 'Sunken Harbor', level: 'Level 3', lessons: [],
+      planned: ['A minor and D minor', 'Triplets', 'Major & minor triads', 'Chord inversions', 'Key signatures', '6/8 time'],
+      plannedSongs: ['Amazing Grace', 'Scarborough Fair', 'Simple Gifts', 'Greensleeves', 'Home on the Range'],
+    },
+    {
+      id: 'peaks', name: 'Ember Peaks', level: 'Level 4', lessons: [],
+      planned: ['Sixteenth notes', 'Syncopation', 'E minor', 'Cadences', 'Arpeggios', 'Dominant 7th inversions'],
+      plannedSongs: ['Minuet in G (Petzold)', 'Can-Can (Offenbach)', 'Brahms\' Lullaby', 'The Entertainer (Joplin)'],
+    },
+    {
+      id: 'citadel', name: 'Starfall Citadel', level: 'Level 5', lessons: [],
+      planned: ['All major scales', 'Relative & harmonic minors', 'Diminished & augmented triads', 'Ornaments & trills', 'Sonatina form'],
+      plannedSongs: ['Für Elise (theme)', 'Prelude in C (Bach)', 'Maple Leaf Rag', 'Canon in D', 'Gymnopédie No. 1'],
+    },
+  ],
+};
