@@ -102,6 +102,8 @@ const LessonUI = (() => {
     tie: ['𝅗𝅥‿♩', 'Tied notes', '2 + 1 = 3 beats', 'ta – a – a', 3, [3]],
     'q.': ['♩.', 'Dotted quarter note', '1½ beats', 'ta – a – (ti)', 2, [1.5]],
     'q.e': ['♩. ♪', 'Dotted quarter + eighth', '2 beats together', 'ta – a – ti', 2, [1.5, 0.5]],
+    s: ['𝅘𝅥𝅯', 'Sixteenth note', '¼ beat', 'ti', 1, [0.25]],
+    ssss: ['♬♬', 'Four sixteenth notes', '1 beat together', '1 – e – and – a', 1, [0.25, 0.25, 0.25, 0.25]],
     trip: ['♪♪♪³', 'Eighth-note triplet', '3 notes in 1 beat', 'tri – po – let', 1, [1 / 3, 1 / 3, 1 / 3]],
   };
 
@@ -403,7 +405,11 @@ const LessonUI = (() => {
       const fb = feedback(w);
       const play = () => {
         const it = st.items[order[k]], t = Sound.init().currentTime + 0.08;
-        it.notes.map(Music.midi).forEach((m, i) => { const at = t + (it.broken || st.broken ? i * 0.28 : 0); Sound.play(m, at, 1.3, 0.6); });
+        // an item is one chord (notes) or a progression of chords, played one after another
+        (it.chords || [it.notes]).forEach((ch, ci) => ch.map(Music.midi).forEach((m, i) => {
+          const at = t + ci * 0.95 + (it.broken || st.broken ? i * 0.28 : 0);
+          Sound.play(m, at, it.chords ? 0.9 : 1.3, 0.6);
+        }));
       };
       $('.again', el).onclick = play;
       el.querySelectorAll('.choice').forEach(btn => btn.onclick = () => {

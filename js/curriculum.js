@@ -796,7 +796,168 @@ const REALM_4 = [
         { hand: 'L', notes: 'r:q | G2+B2+D3:h.:5+3+1 | G2+B2+D3:h. | G2+C3+E3:h.:5+2+1 | G2+B2+D3:h.:5+3+1 | G2+B2+D3:h. | G2+B2+D3:h. | F#2+C3+D3:h.:5+2+1 | F#2+C3+D3:h. | G2+B2+D3:h.:5+3+1 | G2+B2+D3:h. | G2+C3+E3:h.:5+2+1 | G2+B2+D3:h.:5+3+1 | G2+B2+D3:h. | F#2+C3+D3:h.:5+2+1 | G2+B2+D3:h.:5+3+1 | G2+B2+D3:h' },
       ],
     },
-    done: 'The chapel rises out of the sea and its bell rings over the whole harbor! Every light is shining. Far above, in the mountains, something <b>glows like fire</b>… The path beyond is still forming.',
+    done: 'The chapel rises out of the sea and its bell rings over the whole harbor! Every light is shining. Far above, in the mountains, something <b>glows like fire</b>… Open the map: the <b>Ember Peaks</b> are waiting.',
+  },
+];
+
+const REALM_5 = [
+  {
+    id: 'r5-1', title: 'The Ember Steps', concept: 'Sixteenth notes',
+    landmark: { type: 'embersteps', x: 900 }, reward: 'lanterns', meter: 'Each true performance relights a step.',
+    clue: 'The path up the mountain is made of <b>ember steps</b>, and the sparks skip up them <b>four to a beat</b>.',
+    clueShort: 'Find the glowing steps up the mountain.',
+    early: 'Stone steps with cold, grey embers in every crack.',
+    teach: [
+      { say: '<b>Sixteenth notes</b> are twice as fast as eighths: <b>four</b> of them fit in one beat. A single one has two flags; groups are joined by <b>two beams</b>.', show: { type: 'values', values: ['e', 's', 'ssss'] } },
+      { task: 'quiz', q: 'How many sixteenth notes fit in <b>one</b> beat?', options: ['2', '3', '4'], answer: 2 },
+      { say: 'Count them "<b>1 – e – and – a</b>, <b>2 – e – and – a</b>". Keep the beat steady and let the sixteenths spill quickly between.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 72, notation: 'staff', voices: [{ hand: 'R', notes: 'C4:q E4:s D4:s C4:s D4:s E4:q G4:q | F4:s E4:s D4:s E4:s F4:q D4:h' }] } } },
+      { task: 'rhythm', q: 'Tap the spark rhythm: "ta, 1-e-and-a, ta, ta".', rhythm: 'q s s s s q q | s s s s q h', time: [4, 4], tempo: 60 },
+      { say: 'Practise this one at a slow speed first with <b>With the beat</b>. Sixteenths get easy once your fingers know where they\'re going.' },
+    ],
+    song: {
+      title: 'Ember Run', by: 'Original', time: [4, 4], tempo: 72, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'C4:q:1 E4:s:3 D4:s:2 C4:s:1 D4:s:2 E4:q:3 G4:q:5 | F4:s:4 E4:s:3 D4:s:2 E4:s:3 F4:q:4 D4:h:2 | E4:e:3 F4:e:4 G4:s:5 F4:s:4 E4:s:3 D4:s:2 C4:h:1 | D4:s:2 E4:s:3 F4:s:4 G4:s:5 F4:q:4 E4:h:3 | C4:q:1 E4:s:3 D4:s:2 C4:s:1 D4:s:2 E4:q:3 G4:q:5 | F4:s:4 E4:s:3 D4:s:2 E4:s:3 F4:q:4 G4:h:5 | E4:s:3 D4:s:2 C4:s:1 D4:s:2 E4:e:3 D4:e:2 C4:q:1 D4:q:2 | C4:w:1' },
+        { hand: 'L', notes: 'C3:w:5 | G3:w:1 | C3:w:5 | G3:w:1 | C3:w:5 | G3:w:1 | C3:h:5 G3:h:1 | C3:w:5' },
+      ],
+    },
+    done: 'The steps blaze all the way up! Ahead, a rickety bridge zig-zags over a gap, landing its planks <b>between</b> the beats…',
+  },
+  {
+    id: 'r5-2', title: 'The Crooked Bridge', concept: 'Syncopation',
+    landmark: { type: 'crookedbridge', x: 1700 }, reward: 'bridge', meter: 'Each true performance straightens a plank.',
+    clue: 'A crooked bridge crosses the chasm. Its planks land <b>off the beat</b>. Find it and cross in rhythm!',
+    clueShort: 'Find the crooked bridge over the chasm.',
+    early: 'A wobbly bridge with missing planks. Crossing it now would be a bad idea.',
+    teach: [
+      { say: 'Usually the strong notes land <b>on</b> the beat. <b>Syncopation</b> moves the accent <b>between</b> the beats, so the music seems to lean forward. The most common pattern is "<b>ti – ta – ti</b>": eighth, quarter, eighth.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 84, notation: 'staff', voices: [{ hand: 'R', notes: 'C4:e E4:q G4:e G4:q E4:q | D4:e F4:q E4:e D4:h' }, { hand: 'L', notes: 'C3:q G3:q E3:q G3:q | B2:q G3:q F3:q G3:q' }] } } },
+      { task: 'quiz', q: 'In "ti – <b>ta</b> – ti", when does the quarter note start?', options: ['On beat 1', 'Between beat 1 and beat 2', 'On beat 3'], answer: 1 },
+      { task: 'rhythm', q: 'Tap it and feel the lean: "ti-ta-ti, ta, ta".', rhythm: 'e q e q q | e q e h | q e q e q | w', time: [4, 4], tempo: 72 },
+      { say: 'In the song, your left hand keeps a steady beat (1, 2, 3, 4) while the right hand dances around it. That contrast is what makes syncopation fun.' },
+    ],
+    song: {
+      title: 'Offbeat Crossing', by: 'Original', time: [4, 4], tempo: 88, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'C4:e:1 E4:q:3 G4:e:5 G4:q:5 E4:q:3 | D4:e:2 F4:q:4 E4:e:3 D4:h:2 | E4:q:3 G4:e:5 F4:q:4 E4:e:3 D4:q:2 | C4:w:1 | C4:e:1 E4:q:3 G4:e:5 G4:q:5 E4:q:3 | F4:e:4 E4:q:3 D4:e:2 E4:h:3 | D4:q:2 G4:e:5 F4:q:4 E4:e:3 D4:q:2 | C4:w:1' },
+        { hand: 'L', notes: 'C3:q:5 G3:q:1 E3:q:3 G3:q:1 | B2:q:5 G3:q:1 F3:q:2 G3:q:1 | C3:q:5 G3:q:1 E3:q:3 G3:q:1 | C3:q:5 G3:q:1 E3:q:3 G3:q:1 | C3:q:5 G3:q:1 E3:q:3 G3:q:1 | B2:q:5 G3:q:1 F3:q:2 G3:q:1 | B2:q:5 G3:q:1 F3:q:2 G3:q:1 | C3+E3+G3:w:5+3+1' },
+      ],
+    },
+    done: 'Every plank snaps into place and you bounce across! On the far side, a great door is carved into the mountain, and deep inside, something is <b>marching</b>.',
+  },
+  {
+    id: 'r5-3', title: 'The Mountain King\'s Hall', concept: 'E minor · Staccato & building intensity',
+    landmark: { type: 'mountainhall', x: 2500 }, reward: 'door', meter: 'Each true performance opens the hall door wider.',
+    clue: 'Deep in the mountain is the <b>Hall of the Mountain King</b>. His music creeps along softly, then grows and grows…',
+    clueShort: 'Find the great door carved into the mountain.',
+    early: 'A huge stone door in the rock, shut tight. You can hear tiny footsteps behind it.',
+    teach: [
+      { say: '<b>E minor</b> is the relative minor of <b>G major</b>, so it shares G\'s key signature: <b>one sharp, F♯</b>. Its home note is E.', show: { type: 'score', play: true, song: { time: [4, 4], key: 'Em', tempo: 100, notation: 'staff', voices: [{ hand: 'R', notes: 'E4:q F#4:q G4:q A4:q | B4:q C5:q D5:q E5:q' }] } } },
+      { task: 'quiz', q: 'E minor shares its key signature with…', options: ['C major', 'G major', 'F major'], answer: 1 },
+      { say: 'Edvard Grieg wrote this music in 1875 for a play. A hero sneaks into the Mountain King\'s hall. The tune creeps in <b>staccato</b>, very softly, and gets louder and louder as the trolls wake up.' },
+      { say: 'Watch for the chromatic notes, <b>A♯</b> and <b>F</b>♮, that make it spooky. In bar 3, tuck your <b>thumb under</b> on A, just like a scale.', show: { type: 'keys', keys: ['E4', 'F#4', 'G4', 'A4', 'B4', 'E5'], fingers: [1, 2, 3, 1, 2, 5] } },
+      { task: 'tap', order: true, hint: true, q: 'Practise bar 3: E F♯ G, thumb under to A, B G B, then up to E.', targets: ['E4', 'F#4', 'G4', 'A4', 'B4', 'G4', 'B4', 'E5'], fingers: [1, 2, 3, 1, 2, 1, 2, 5] },
+    ],
+    song: {
+      title: 'In the Hall of the Mountain King', by: 'Edvard Grieg (1875)', time: [4, 4], key: 'Em', tempo: 96, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'E4:e:1:.,p F#4:e:2:. G4:e:3:. A4:e:4:. B4:e:5:. G4:e:3:. B4:q:5:. | A#4:e:4:. F#4:e:2:. A#4:q:4:. A4:e:4:. F4:e:2:. A4:q:4:. | E4:e:1:. F#4:e:2:. G4:e:3:. A4:e:1:. B4:e:2:. G4:e:1:. B4:e:2:. E5:e:5:. | D5:e:4:. B4:e:2:. G4:e:1:. B4:e:2:. D5:h:4 | E4:e:1:.,mf F#4:e:2:. G4:e:3:. A4:e:4:. B4:e:5:. G4:e:3:. B4:q:5:. | A#4:e:4:. F#4:e:2:. A#4:q:4:. A4:e:4:. F4:e:2:. A4:q:4:. | E4:e:1:.,< F#4:e:2:. G4:e:3:. A4:e:1:. B4:e:2:. G4:e:1:. B4:e:2:. E5:e:5:. | D5:e:4:. B4:e:2:. G4:e:1:. B4:e:2:. E5:h:5:f,/' },
+        { hand: 'L', notes: 'E2:q:5:. B2:q:1:. E2:q:5:. B2:q:1:. | E2:q:5:. B2:q:1:. E2:q:5:. B2:q:1:. | E2:q:5:. B2:q:1:. E2:q:5:. B2:q:1:. | E2:q:5:. B2:q:1:. E2:q:5:. B2:q:1:. | E2:q:5:. B2:q:1:. E2:q:5:. B2:q:1:. | E2:q:5:. B2:q:1:. E2:q:5:. B2:q:1:. | E2:q:5:. B2:q:1:. E2:q:5:. B2:q:1:. | E2:q:5:. B2:q:1:. E2+B2:h:5+1' },
+      ],
+    },
+    done: 'CRASH! The hall doors burst open and the trolls dance off into the mountain. Beyond the hall, a waterfall of <b>glowing sparks</b> pours down like harp strings.',
+  },
+  {
+    id: 'r5-4', title: 'The Harp Falls', concept: 'Arpeggios across the keyboard',
+    landmark: { type: 'harpfalls', x: 3300 }, reward: 'stars', meter: 'Each true performance sets another spark-string ringing.',
+    clue: 'A waterfall of sparks tumbles down the cliff like the strings of a <b>harp</b>. Its music rolls up and down, one note at a time.',
+    clueShort: 'Find the waterfall of sparks.',
+    early: 'A dry cliff with dark grooves in it, like harp strings with no sound.',
+    teach: [
+      { say: 'An <b>arpeggio</b> is a chord played <b>one note at a time</b>, like a harp. It can climb across more than one octave.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 88, notation: 'staff', voices: [{ hand: 'R', notes: 'C4:e E4:e G4:e C5:e E5:e G5:e E5:e C5:e | G4:e E4:e C4:e E4:e G4:h' }] } } },
+      { say: 'Going up: fingers <b>1 2 3</b>, then tuck your <b>thumb under</b> to the next C and keep climbing <b>1 2 3</b>. Coming down, finger <b>3 crosses over</b> the thumb.', show: { type: 'keys', keys: ['C4', 'E4', 'G4', 'C5', 'E5', 'G5'], fingers: [1, 2, 3, 1, 2, 3] } },
+      { task: 'tap', order: true, hint: true, q: 'Climb the C arpeggio: C E G, thumb under, C E G.', targets: ['C4', 'E4', 'G4', 'C5', 'E5', 'G5'], fingers: [1, 2, 3, 1, 2, 3] },
+      { task: 'tap', order: true, hint: true, q: 'And back down: G E C, 3 crosses over, G E C.', targets: ['G5', 'E5', 'C5', 'G4', 'E4', 'C4'], fingers: [3, 2, 1, 3, 2, 1] },
+      { say: 'In this song your right hand plays arpeggios on <b>C</b>, <b>F</b> and <b>G</b> while the left hand holds the chords underneath.' },
+    ],
+    song: {
+      title: 'Firefall', by: 'Original', time: [4, 4], tempo: 80, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'C4:e:1 E4:e:2 G4:e:3 C5:e:1 E5:e:2 G5:e:3 E5:e:2 C5:e:1 | G4:e:3 E4:e:2 C4:e:1 E4:e:2 G4:h:3 | C4:e:1 F4:e:2 A4:e:3 C5:e:1 F5:e:2 A5:e:3 F5:e:2 C5:e:1 | A4:e:3 F4:e:2 C4:e:1 F4:e:2 A4:h:3 | B3:e:1 D4:e:2 G4:e:3 B4:e:1 D5:e:2 G5:e:3 D5:e:2 B4:e:1 | G4:e:3 D4:e:2 B3:e:1 D4:e:2 G4:h:3 | C4:e:1 E4:e:2 G4:e:3 C5:e:1 E5:e:2 G5:e:3 C6:q:5 | C5:w:1' },
+        { hand: 'L', notes: 'C3+E3+G3:w:5+3+1 | C3+E3+G3:w | C3+F3+A3:w:5+2+1 | C3+F3+A3:w | B2+D3+G3:w:5+3+1 | B2+D3+G3:w | C3+E3+G3:w:5+3+1 | C3+E3+G3:w' },
+      ],
+    },
+    done: 'The falls pour down in rivers of light! Past them, three stone gates stand in a row, each one ending the path a <b>different way</b>.',
+  },
+  {
+    id: 'r5-5', title: 'The Cadence Gates', concept: 'Cadences: authentic, half & plagal',
+    landmark: { type: 'cadencegates', x: 4100 }, reward: 'door', meter: 'Each true performance opens a gate.',
+    clue: 'Three gates, three ways to end a musical sentence. Some endings say "<b>the end</b>", some ask "<b>…and then?</b>", and one sings "<b>A-men</b>".',
+    clueShort: 'Find the three stone gates in a row.',
+    early: 'Three gates side by side, all locked. Their carvings read: V–I, I–V, IV–I.',
+    teach: [
+      { say: 'A <b>cadence</b> is how a musical sentence ends. Just like a full stop, a comma or a question mark, each one feels different.' },
+      { say: 'An <b>authentic cadence</b> goes <b>V7 → I</b>. It sounds finished: "The end." A <b>half cadence</b> stops <b>on V</b>. It sounds like a question: "…and then?"', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 72, notation: 'staff', voices: [{ hand: 'R', notes: 'C4+E4+G4:h B3+D4+F4+G4:h | C4+E4+G4:w | C4+E4+G4:h C4+F4+A4:h | B3+D4+G4:w' }] } } },
+      { say: 'A <b>plagal cadence</b> goes <b>IV → I</b>. It\'s gentle and warm, the "<b>A-men</b>" at the end of many hymns.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 60, notation: 'staff', voices: [{ hand: 'R', notes: 'C4+F4+A4:w | C4+E4+G4:w' }] } } },
+      { task: 'ear', q: 'Listen to each ending. Which cadence is it?', choices: [['authentic', 'Authentic V–I (the end)'], ['half', 'Half ends on V (a question)'], ['plagal', 'Plagal IV–I (amen)']], hint: 'Does it sound finished, unfinished, or like "A-men"?', praise: 'You can hear how music ends!', items: [
+        { chords: [['C4', 'E4', 'G4'], ['B3', 'D4', 'F4', 'G4'], ['C4', 'E4', 'G4']], answer: 'authentic' },
+        { chords: [['C4', 'E4', 'G4'], ['C4', 'F4', 'A4'], ['B3', 'D4', 'G4']], answer: 'half' },
+        { chords: [['C4', 'E4', 'G4'], ['C4', 'F4', 'A4'], ['C4', 'E4', 'G4']], answer: 'plagal' },
+        { chords: [['G3', 'B3', 'D4'], ['F#3', 'C4', 'D4'], ['G3', 'B3', 'D4']], answer: 'authentic' },
+        { chords: [['G3', 'B3', 'D4'], ['A3', 'C4', 'E4'], ['F#3', 'A3', 'D4']], answer: 'half' },
+        { chords: [['G3', 'B3', 'D4'], ['G3', 'C4', 'E4'], ['G3', 'B3', 'D4']], answer: 'plagal' },
+      ] },
+      { say: 'This song has <b>three</b> phrases, one for each gate: the first ends on a <b>half cadence</b>, the second on an <b>authentic</b> one, and the last on a <b>plagal</b> "Amen".' },
+    ],
+    song: {
+      title: 'Three Endings', by: 'Original', time: [4, 4], tempo: 80, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'E4:q:3 D4:q:2 C4:q:1 E4:q:3 | F4:q:4 E4:q:3 D4:h:2 | E4:q:3 G4:q:5 F4:q:4 E4:q:3 | D4:w:2 | E4:q:3 D4:q:2 C4:q:1 E4:q:3 | F4:q:4 E4:q:3 D4:q:2 C4:q:1 | D4:h:2 G4:h:5 | C4:w:1 | G4:q:5 F4:q:4 E4:q:3 G4:q:5 | F4:w:4 | E4:w:3' },
+        { hand: 'L', notes: 'C3+E3+G3:w:5+3+1 | B2+F3+G3:w:5+2+1 | C3+E3+G3:w:5+3+1 | B2+D3+G3:w:5+3+1 | C3+E3+G3:w:5+3+1 | C3+F3+A3:w:5+2+1 | B2+F3+G3:w:5+2+1 | C3+E3+G3:w:5+3+1 | C3+E3+G3:w | C3+F3+A3:w:5+2+1 | C3+E3+G3:w:5+3+1' },
+      ],
+    },
+    done: 'All three gates swing open: one with a question, one with a full stop, one with an Amen. Behind them, hammers are ringing in the mountain\'s <b>forge</b>.',
+  },
+  {
+    id: 'r5-6', title: 'The Forge', concept: 'The V7 chord and its inversions',
+    landmark: { type: 'forge', x: 4900 }, reward: 'crystal', meter: 'Each true performance stokes the forge fire.',
+    clue: 'Clang, clang! The mountain <b>forge</b> is where chords are hammered into new shapes. Find the anvil!',
+    clueShort: 'Follow the clang of the forge.',
+    early: 'A cold forge. The anvil is silent and the fire has gone out.',
+    teach: [
+      { say: 'The full <b>V7 chord</b> in C has <b>four</b> notes: <b>G B D F</b>. It\'s a G major chord plus an extra note, F, a <b>7th</b> above the root.', show: { type: 'keys', keys: ['G4', 'B4', 'D5', 'F5'], fingers: [1, 2, 3, 5] } },
+      { say: 'Four notes means <b>four</b> shapes: <b>root position</b> G B D F, <b>1st inversion</b> B D F G, <b>2nd inversion</b> D F G B, and <b>3rd inversion</b> F G B D. Listen to each one resolve to C.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 72, notation: 'staff', voices: [{ hand: 'R', notes: 'G4+B4+D5+F5:h C5+E5+G5:h | B3+D4+F4+G4:h C4+E4+G4:h | D4+F4+G4+B4:h E4+G4+C5:h | F4+G4+B4+D5:h E4+G4+C5:h' }] } } },
+      { task: 'together', q: 'Play <b>1st inversion</b>: B, D, F and G together (fingers 1 2 4 5). Three times!', notes: ['B3', 'D4', 'F4', 'G4'], fingers: [1, 2, 4, 5], hands: ['R', 'R', 'R', 'R'], count: 3, praise: 'V7, first inversion!' },
+      { task: 'together', q: 'Now <b>3rd inversion</b>: F, G, B and D (fingers 1 2 3 5). Three times!', notes: ['F4', 'G4', 'B4', 'D5'], fingers: [1, 2, 3, 5], hands: ['R', 'R', 'R', 'R'], count: 3, praise: 'V7, third inversion!' },
+      { task: 'quiz', q: 'In the key of C, which note is the <b>7th</b> of the V7 chord?', options: ['G', 'D', 'F'], answer: 2 },
+    ],
+    song: {
+      title: 'The Forge', by: 'Original', time: [4, 4], tempo: 72, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'C4+E4+G4:h:1+3+5 B3+D4+F4+G4:h:1+2+4+5 | C4+E4+G4:w:1+3+5 | E4+G4+C5:h:1+2+5 D4+F4+G4+B4:h:1+2+3+5 | E4+G4+C5:w:1+2+5 | G4+C5+E5:h:1+3+5 F4+G4+B4+D5:h:1+2+3+5 | E4+G4+C5:w:1+2+5 | C4+E4+G4:h:1+3+5 G4+B4+D5+F5:h:1+2+3+5 | G4+C5+E5:w:1+3+5' },
+        { hand: 'L', notes: 'C3:h:1 G2:h:5 | C3:w:1 | C3:h:1 G2:h:5 | C3:w:1 | C3:h:1 G2:h:5 | C3:w:1 | C3:h:1 G2:h:5 | C3:w:1' },
+      ],
+    },
+    done: 'The forge roars back to life and sparks fly up to the <b>summit</b>. At the very top, lights are dancing in a graceful three-step.',
+  },
+  {
+    id: 'r5-7', title: 'The Summit Pavilion', concept: 'Ember Peaks finale: a real Baroque minuet',
+    landmark: { type: 'pavilion', x: 5700 }, reward: 'stars', meter: 'Each true performance lights the summit.',
+    clue: 'At the very top of the mountain stands an old <b>pavilion</b> where lights once danced a <b>minuet</b>: an elegant dance in three.',
+    clueShort: 'Climb to the pavilion at the summit.',
+    early: 'An empty pavilion at the top of the world. The dance floor is dark.',
+    teach: [
+      { say: 'A <b>minuet</b> is an elegant dance in <b>3/4</b> time from the 1600s and 1700s. This one was written by <b>Christian Petzold</b> and copied into a notebook for the family of J. S. Bach. Pianists have learned it for 300 years.' },
+      { say: 'It\'s in <b>G major</b>. Watch the key signature: every F is F♯. The right hand moves up and down the keyboard, so follow the finger numbers closely.', show: { type: 'score', play: true, song: { time: [3, 4], key: 'G', tempo: 108, notation: 'staff', voices: [{ hand: 'R', notes: 'D5:q:5 G4:e:1 A4:e:2 B4:e:3 C5:e:4 | D5:q:5 G4:q:1 G4:q:1' }] } } },
+      { say: 'Your left hand plays chords in G with inversions: <b>I</b>, <b>IV</b>, <b>ii</b> (A minor) and <b>V7</b>. Try each hand alone, then together, and play it like a dance!', show: { type: 'keys', keys: ['F#2', 'G2', 'A2', 'B2', 'C3', 'D3', 'E3'], hands: ['L', 'L', 'L', 'L', 'L', 'L', 'L'] } },
+    ],
+    song: {
+      title: 'Minuet in G', by: 'Christian Petzold (c. 1725)', time: [3, 4], key: 'G', tempo: 108, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'D5:q:5 G4:e:1 A4:e:2 B4:e:3 C5:e:4 | D5:q:5 G4:q:1 G4:q:1 | E5:q:4 C5:e:1 D5:e:2 E5:e:3 F#5:e:4 | G5:q:5 G4:q:1 G4:q:1 | C5:q:4 D5:e:5 C5:e:4 B4:e:3 A4:e:2 | B4:q:3 C5:e:4 B4:e:3 A4:e:2 G4:e:1 | F#4:q:1 G4:e:2 A4:e:3 B4:e:4 G4:e:2 | A4:h.:3 | D5:q:5 G4:e:1 A4:e:2 B4:e:3 C5:e:4 | D5:q:5 G4:q:1 G4:q:1 | E5:q:4 C5:e:1 D5:e:2 E5:e:3 F#5:e:4 | G5:q:5 G4:q:1 G4:q:1 | C5:q:4 D5:e:5 C5:e:4 B4:e:3 A4:e:2 | B4:q:3 C5:e:4 B4:e:3 A4:e:2 G4:e:1 | A4:q:3 B4:e:4 A4:e:3 G4:e:2 F#4:e:1 | G4:h.:2' },
+        { hand: 'L', notes: 'G2+B2+D3:h.:5+3+1 | G2+B2+D3:h. | G2+C3+E3:h.:5+2+1 | G2+B2+D3:h.:5+3+1 | A2+C3+E3:h.:5+3+1 | G2+B2+D3:h.:5+3+1 | F#2+C3+D3:h.:5+2+1 | F#2+C3+D3:h. | G2+B2+D3:h.:5+3+1 | G2+B2+D3:h. | G2+C3+E3:h.:5+2+1 | G2+B2+D3:h.:5+3+1 | A2+C3+E3:h.:5+3+1 | G2+B2+D3:h.:5+3+1 | F#2+C3+D3:h.:5+2+1 | G2+B2+D3:h.:5+3+1' },
+      ],
+    },
+    done: 'Lights whirl around the pavilion in a perfect minuet, and the whole mountain range glows like sunrise! High above, among the stars, a <b>citadel</b> is shimmering into view… The path beyond is still forming.',
   },
 ];
 
@@ -854,9 +1015,17 @@ const CURRICULUM = {
       planned: ['D minor', 'More songs: Scarborough Fair, Simple Gifts, Greensleeves, Home on the Range'],
     },
     {
-      id: 'peaks', name: 'Ember Peaks', level: 'Level 4', lessons: [],
-      planned: ['Sixteenth notes', 'Syncopation', 'E minor', 'Cadences', 'Arpeggios', 'Dominant 7th inversions'],
-      plannedSongs: ['Minuet in G (Petzold)', 'Can-Can (Offenbach)', 'Brahms\' Lullaby', 'The Entertainer (Joplin)'],
+      id: 'peaks', name: 'Ember Peaks', level: 'Level 4', decor: 'peaks', length: 6400, start: 250,
+      palette: {
+        silent: { skyTop: '#4a4652', skyBot: '#9a94a0', far: '#6e6874', mid: '#5c5660', near: '#3f3a44', ground: '#35303a', fog: '#9a94a0' },
+        awake: { skyTop: '#2a0f4d', skyBot: '#ff8a4c', far: '#6a2f86', mid: '#b3442e', near: '#4a2233', ground: '#3a1a28', fog: '#ffc39a' },
+      },
+      intro: [
+        'The <b>Ember Peaks</b>. These mountains used to glow with music, like coals in a fire. Now they\'re cold and grey.',
+        'The songs up here are <b>fast</b> and <b>tricky</b>: sixteenth notes, offbeat rhythms and chords with four notes. Take them one step at a time and the peaks will blaze again!',
+      ],
+      lessons: REALM_5,
+      planned: ['More songs: Brahms\' Lullaby, Can-Can, The Entertainer'],
     },
     {
       id: 'citadel', name: 'Starfall Citadel', level: 'Level 5', lessons: [],

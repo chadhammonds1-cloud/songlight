@@ -1,7 +1,7 @@
 'use strict';
 // Song parsing. Voice strings are tokens of  pitch:duration[:finger[:marks]]
 //   pitch    C4, F#3, Bb4, chords as C3+G3, rest as r
-//   duration w h. h q. q e, and t for one note of an eighth-note triplet (⅓ beat)
+//   duration w h. h q. q e. e s, and t for one note of an eighth-note triplet (⅓ beat)
 //   finger   3, or L3 / R2 to set the hand for that note, chords as L5+1
 //   marks    comma-separated: a dynamic (pp p mp mf f), . staccato, ~ tie to the next note,
 //            ( slur start, ) slur end, < crescendo start, > diminuendo start, / hairpin end,
@@ -14,7 +14,7 @@
 const Music = (() => {
   const LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
   const SEMI = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-  const DUR = { w: 4, 'h.': 3, h: 2, 'q.': 1.5, q: 1, 'e.': 0.75, e: 0.5, t: 1 / 3 };
+  const DUR = { w: 4, 'h.': 3, h: 2, 'q.': 1.5, q: 1, 'e.': 0.75, e: 0.5, t: 1 / 3, s: 0.25 };
   // sharps (+) or flats (−) in each key signature
   const KEYS = { C: 0, G: 1, D: 2, A: 3, E: 4, F: -1, Bb: -2, Eb: -3, Am: 0, Em: 1, Bm: 2, Dm: -1, Gm: -2, Cm: -3 };
   const NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];

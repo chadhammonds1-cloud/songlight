@@ -150,12 +150,12 @@ const Notation = (() => {
       const unit = song.pulse || 1;
       for (let i = 0; i < evs.length; i++) {
         const a = evs[i];
-        if (a.rest || a.dur >= 1 || a.dur === 0.75) continue;
+        if (a.rest || a.dur >= 1) continue;
         const cell = Math.floor((a.beat + (song.offset || 0)) / unit + 1e-6);
         const grp = [a];
         for (let j = i + 1; j < evs.length; j++) {
           const b = evs[j];
-          if (b.rest || b.dur >= 1 || b.dur === 0.75 || b.hand !== a.hand || Math.floor((b.beat + (song.offset || 0)) / unit + 1e-6) !== cell) break;
+          if (b.rest || b.dur >= 1 || b.hand !== a.hand || Math.floor((b.beat + (song.offset || 0)) / unit + 1e-6) !== cell) break;
           grp.push(b);
         }
         if (grp.length < 2) continue;
@@ -215,8 +215,12 @@ const Notation = (() => {
           e._stemEl = E('line', { x1: sx, x2: sx, y1: up ? yBot : yTop, y2, class: 'stem' }, g);
           e._stem = { x: sx, y: y2, up };
           if (e.dur < 1 && !e.beamed) {
-            const d = up ? `M${sx} ${y2} q${sp * 0.3} ${sp * 1.4} ${sp * 1.3} ${sp * 1.9} q${sp * 0.6} ${sp * 0.6} ${sp * 0.1} ${sp * 1.5}` : `M${sx} ${y2} q${sp * 0.3} ${-sp * 1.4} ${sp * 1.3} ${-sp * 1.9} q${sp * 0.6} ${-sp * 0.6} ${sp * 0.1} ${-sp * 1.5}`;
-            E('path', { d, class: 'flag' }, g);
+            // one flag for an eighth, two for a sixteenth
+            for (let f = 0; f < (e.dur <= 0.25 + 1e-6 ? 2 : 1); f++) {
+              const fy = y2 + (up ? 1 : -1) * f * sp * 1.1;
+              const d = up ? `M${sx} ${fy} q${sp * 0.3} ${sp * 1.4} ${sp * 1.3} ${sp * 1.9} q${sp * 0.6} ${sp * 0.6} ${sp * 0.1} ${sp * 1.5}` : `M${sx} ${fy} q${sp * 0.3} ${-sp * 1.4} ${sp * 1.3} ${-sp * 1.9} q${sp * 0.6} ${-sp * 0.6} ${sp * 0.1} ${-sp * 1.5}`;
+              E('path', { d, class: 'flag' }, g);
+            }
           }
         }
         if (e.fingers.length) {
@@ -239,7 +243,19 @@ const Notation = (() => {
         const yb = up ? Math.min(...grp.map(e => e._stem.y)) : Math.max(...grp.map(e => e._stem.y));
         grp.forEach(e => e._stemEl.setAttribute('y2', yb));
         const th = sp * 0.5 * (up ? 1 : -1);
-        E('polygon', { points: `${a._stem.x},${yb} ${b._stem.x},${yb} ${b._stem.x},${yb + th} ${a._stem.x},${yb + th}`, class: 'beam' }, gNotes);
+        const bar = (x1, x2, y) => E('polygon', { points: `${x1},${y} ${x2},${y} ${x2},${y + th} ${x1},${y + th}`, class: 'beam' }, gNotes);
+        bar(a._stem.x, b._stem.x, yb);
+        // Sixteenths get a second beam: joined between neighbours, a short stub when alone.
+        const y16 = yb + th * 1.7, is16 = e => e.dur <= 0.25 + 1e-6;
+        grp.forEach((e, k) => {
+          if (!is16(e)) return;
+          const nx = grp[k + 1], pv = grp[k - 1];
+          if (nx && is16(nx)) bar(e._stem.x, nx._stem.x, y16);
+          else if (!(pv && is16(pv))) {
+            const toward = nx ? 1 : -1, len = Math.min(sp * 1.3, Math.abs((nx || pv)._stem.x - e._stem.x) / 2);
+            bar(e._stem.x, e._stem.x + toward * len, y16);
+          }
+        });
         // The triplet 3 goes on the notehead side, clear of the finger numbers above the beam.
         if (grp.some(e => e.code === 't')) {
           const heads = grp.flatMap(e => e._ys);
