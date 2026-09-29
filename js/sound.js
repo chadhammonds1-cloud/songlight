@@ -3,6 +3,8 @@
 const Sound = (() => {
   let ctx = null, master, bus, volume = 0.8;
   const held = new Map();
+  const sustained = new Map(); // released keys still ringing under the pedal
+  let pedal = false;
   let scheduled = [];
 
   function init() {
@@ -73,11 +75,18 @@ const Sound = (() => {
   function noteOn(m, vel = 0.7) {
     if (!init()) return;
     noteOff(m);
+    sustained.get(m)?.release(); sustained.delete(m);
     held.set(m, voice(m, vel, ctx.currentTime));
   }
   function noteOff(m) {
     const v = held.get(m);
-    if (v) { v.release(); held.delete(m); }
+    if (!v) return;
+    held.delete(m);
+    if (pedal) sustained.set(m, v); else v.release();
+  }
+  function setPedal(on) {
+    pedal = on;
+    if (!on) { sustained.forEach(v => v.release()); sustained.clear(); }
   }
   function play(m, when, dur, vel = 0.6, opts) {
     if (!init()) return null;
@@ -112,5 +121,5 @@ const Sound = (() => {
   }
   function setVolume(v) { volume = v; if (master) master.gain.value = v; }
 
-  return { init, noteOn, noteOff, play, click, stopScheduled, chime, pad, setVolume, get ctx() { return ctx; } };
+  return { init, noteOn, noteOff, setPedal, play, click, stopScheduled, chime, pad, setVolume, get ctx() { return ctx; } };
 })();

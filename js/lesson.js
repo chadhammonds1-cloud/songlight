@@ -100,6 +100,8 @@ const LessonUI = (() => {
     e: ['♪', 'Eighth note', '½ beat', 'ti', 1, [0.5]],
     ee: ['♫', 'Two eighth notes', '1 beat together', 'ti – ti', 1, [0.5, 0.5]],
     tie: ['𝅗𝅥‿♩', 'Tied notes', '2 + 1 = 3 beats', 'ta – a – a', 3, [3]],
+    'q.': ['♩.', 'Dotted quarter note', '1½ beats', 'ta – a – (ti)', 2, [1.5]],
+    'q.e': ['♩. ♪', 'Dotted quarter + eighth', '2 beats together', 'ta – a – ti', 2, [1.5, 0.5]],
   };
 
   function renderShow(sh, w) {
@@ -363,6 +365,32 @@ const LessonUI = (() => {
         if (idx >= targets.length && !Object.keys(downAt).length) finish();
       });
       hintNext(); say();
+    },
+
+    // Pedal down, play the notes (they keep ringing), pedal up.
+    pedal(st, w, done) {
+      const targets = st.notes.map(Music.midi);
+      let idx = 0, phase = 'down';
+      const el = add(w, `<div class="dyn-row"><span class="dchip" data-p="down">⬇ pedal down</span><span class="dchip" data-p="play">play</span><span class="dchip" data-p="up">⬆ pedal up</span></div>
+        <div class="targets">${targets.map(m => `<span class="tchip">${Music.letterOf(m)}</span>`).join('')}</div>`);
+      const fb = feedback(w), chips = el.querySelectorAll('.tchip');
+      const mark = p => $(`[data-p="${p}"]`, w).classList.add('got');
+      const hintNext = () => piano.hint([{ midi: targets[idx], finger: st.fingers?.[idx], hand: st.hand || 'R' }]);
+      fb('Press the pedal with your right foot, or hold <kbd>Shift</kbd> on the computer keyboard.');
+      if (Input.pedal) { phase = 'play'; mark('down'); hintNext(); fb('The pedal is down. Now play the glowing keys and let go of each one.'); }
+      offs.push(Input.on('pedal', on => {
+        if (on && phase === 'down') { phase = 'play'; mark('down'); hintNext(); fb('Pedal down! Play the glowing keys, and let go of each one. Hear them keep ringing?'); }
+        else if (!on && phase === 'play') { phase = 'down'; idx = 0; chips.forEach(c => c.classList.remove('got')); piano.clearHints(); $('[data-p="down"]', w).classList.remove('got'); fb('The pedal came up too soon. Press it down again and play all the notes first.'); }
+        else if (!on && phase === 'up') { phase = 'done'; mark('up'); fb('Listen: the sound stops when the pedal lifts. ' + praise()); done(); }
+      }));
+      listen('down', m => {
+        if (phase === 'down') { fb('Press the pedal first (or hold <kbd>Shift</kbd>).'); return; }
+        if (phase !== 'play') return;
+        if (m !== targets[idx]) { piano.flash(m, 'bad'); return; }
+        piano.flash(m, 'good'); piano.unhint(m); chips[idx].classList.add('got'); idx++;
+        if (idx < targets.length) hintNext();
+        else { phase = 'up'; mark('play'); fb('Everything is ringing together. Now <b>lift</b> the pedal.'); }
+      });
     },
 
     dyn(st, w, done) {

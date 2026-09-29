@@ -475,7 +475,167 @@ const REALM_2 = [
         { hand: 'L', notes: 'C3+E3+G3:w:5+3+1 | C3+E3+G3:w | C3+E3+G3:w | C3+E3+G3:w | C3+E3+G3:w | C3+E3+G3:w | C3+E3+G3:w | B2+F3+G3:w:5+2+1 | C3+E3+G3:w:5+3+1 | C3+E3+G3:w | C3+E3+G3:w | B2+F3+G3:w:5+2+1 | C3+E3+G3:w:5+3+1 | C3+E3+G3:w | B2+F3+G3:w:5+2+1 | C3+E3+G3:w:5+3+1' },
       ],
     },
-    done: 'The great door swings open and the whole of Whisperwood is <b>marching</b>! Every tree is singing. Look at the map: the mist over the <b>Crystal Caverns</b> is starting to thin…',
+    done: 'The great door swings open and the whole of Whisperwood is <b>marching</b>! Every tree is singing. Look at the map: the mist over the <b>Crystal Caverns</b> has lifted!',
+  },
+];
+
+const REALM_3 = [
+  {
+    id: 'r3-1', title: 'The Stalactite Stair', concept: 'The C major scale · Thumb under & crossing over',
+    landmark: { type: 'stalactites', x: 900 }, reward: 'stars', meter: 'Each true performance lights a stalactite.',
+    clue: 'Eight crystal spikes hang from the ceiling, each one a little longer than the last. Find the <b>stair of eight</b>.',
+    clueShort: 'Find the eight crystals that hang like a stair.',
+    early: 'Eight dark stalactites, short to long. Tap one… thunk. No song yet.',
+    teach: [
+      { say: 'A <b>scale</b> is eight notes marching up by step, from one C all the way to the next C: <b>C D E F G A B C</b>. It\'s called the <b>C major scale</b>.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 100, notation: 'staff', voices: [{ hand: 'R', notes: 'C4:q D4:q E4:q F4:q | G4:q A4:q B4:q C5:q' }] } } },
+      { say: 'A <b>half step</b> is the very next key, with nothing in between. <b>E–F</b> and <b>B–C</b> are half steps. A <b>whole step</b> skips one key. The major scale is two matching groups of four: <b>whole, whole, half</b>.', show: { type: 'keys', keys: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'] } },
+      { task: 'quiz', q: 'Which two notes in the C scale are only a <b>half step</b> apart (besides B and C)?', options: ['C and D', 'E and F', 'G and A'], answer: 1 },
+      { say: 'Five fingers, eight notes! Play <b>1 2 3</b>, then tuck your <b>thumb under</b> to F and keep going: <b>1 2 3 4 5</b>.', show: { type: 'keys', keys: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'], fingers: [1, 2, 3, 1, 2, 3, 4, 5] } },
+      { task: 'tap', order: true, hint: true, q: 'Play the C scale going <b>up</b>. Thumb under after E!', targets: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'], fingers: [1, 2, 3, 1, 2, 3, 4, 5] },
+      { task: 'tap', order: true, hint: true, q: 'Now <b>down</b>: 5 4 3 2 1, then finger <b>3 crosses over</b> the thumb to E.', targets: ['C5', 'B4', 'A4', 'G4', 'F4', 'E4', 'D4', 'C4'], fingers: [5, 4, 3, 2, 1, 3, 2, 1] },
+    ],
+    song: {
+      title: 'Crystal Stair', by: 'Original', time: [4, 4], tempo: 84, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'C4:q:1 D4:q:2 E4:q:3 F4:q:1 | G4:q:2 A4:q:3 B4:q:4 C5:q:5 | C5:h:5 G4:h:2 | A4:q:3 G4:q:2 F4:q:1 E4:q:3 | D4:q:2 E4:q:3 F4:q:4 G4:q:5 | E4:h:3 C4:h:1 | D4:q:2 G4:q:5 F4:q:4 D4:q:2 | C4:w:1' },
+        { hand: 'L', notes: 'C3:w:5 | G3:w:1 | E3:w:3 | F3:w:2 | G3:w:1 | C3:w:5 | G3:w:1 | C3:w:5' },
+      ],
+    },
+    done: 'All eight crystals are ringing, low to high! Rumble… rumble… something on the <b>rails</b> ahead wants to roll.',
+  },
+  {
+    id: 'r3-2', title: 'The Miner\'s Cart', concept: 'Dotted quarter notes',
+    landmark: { type: 'minecart', x: 1700 }, reward: 'bridge', meter: 'Each true performance rebuilds part of the cart bridge.',
+    clue: 'An old mine cart is stuck at a broken <b>bridge</b>. The song that fixes it goes long… short… long… short.',
+    clueShort: 'Find the mine cart by the broken bridge.',
+    early: 'A rusty mine cart, stuck at the edge of a broken track.',
+    teach: [
+      { say: 'A <b>dot</b> adds half of a note\'s value. A quarter note is 1 beat, so a <b>dotted quarter</b> is 1 + ½ = <b>1½ beats</b>. It\'s usually followed by an <b>eighth note</b>, and together they fill 2 beats.', show: { type: 'values', values: ['q', 'q.', 'q.e'] } },
+      { task: 'quiz', q: 'A <b>dotted quarter note</b> lasts…', options: ['1 beat', '1½ beats', '2 beats'], answer: 1 },
+      { say: 'Count it "<b>1 – 2 – and</b>": hold through beat 2, then the eighth note slips in on "and". Listen for the rocking long–short.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 88, notation: 'staff', voices: [{ hand: 'R', notes: 'G4:q. A4:e G4:q F4:q | E4:q F4:q G4:h' }] } } },
+      { task: 'rhythm', q: 'Tap the cart rhythm: long, short, then steady.', rhythm: 'q. e q q | q q h | q. e q q | h h', time: [4, 4], tempo: 72 },
+      { say: 'This is <b>London Bridge</b>. Your right thumb starts on <b>D</b>, and stretches down to C at the very end. Your left hand plays the <b>C</b> and <b>G7</b> chords.', show: { type: 'keys', keys: ['B2', 'C3', 'E3', 'F3', 'G3', 'D4', 'E4', 'F4', 'G4', 'A4'], fingers: [5, 5, 3, 2, 1, 1, 2, 3, 4, 5], hands: ['L', 'L', 'L', 'L', 'L', 'R', 'R', 'R', 'R', 'R'] } },
+    ],
+    song: {
+      title: 'London Bridge', by: 'Traditional', time: [4, 4], tempo: 92, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'G4:q.:4 A4:e:5 G4:q:4 F4:q:3 | E4:q:2 F4:q:3 G4:h:4 | D4:q:1 E4:q:2 F4:h:3 | E4:q:2 F4:q:3 G4:h:4 | G4:q.:4 A4:e:5 G4:q:4 F4:q:3 | E4:q:2 F4:q:3 G4:h:4 | D4:h:1 G4:h:4 | E4:q:2 C4:h.:1' },
+        { hand: 'L', notes: 'C3+E3+G3:w:5+3+1 | C3+E3+G3:w | B2+F3+G3:w:5+2+1 | C3+E3+G3:w:5+3+1 | C3+E3+G3:w | C3+E3+G3:w | B2+F3+G3:w:5+2+1 | C3+E3+G3:w:5+3+1' },
+      ],
+    },
+    done: 'The bridge is whole again and the cart goes rattling over! Up ahead, a round stone is sparkling like a <b>birthday cake</b>.',
+  },
+  {
+    id: 'r3-3', title: 'The Birthday Geode', concept: 'Pickup notes · B♭ · Hand shifts',
+    landmark: { type: 'geode', x: 2500 }, reward: 'crystal', meter: 'Each true performance lights a candle in the geode.',
+    clue: 'Somebody in the caves is having a <b>birthday</b>! Find the round stone that sparkles like a cake.',
+    clueShort: 'Find the geode that sparkles like a birthday cake.',
+    early: 'A round stone, cracked open. Inside, dull crystals. It looks like it\'s waiting for a party.',
+    teach: [
+      { say: 'Some songs start <b>before</b> beat 1! Those first notes are called a <b>pickup</b>. Then the last measure is short, so the pickup and the last measure add up to one full measure.', show: { type: 'score', play: true, song: { time: [3, 4], tempo: 100, pickup: 1, notation: 'staff', voices: [{ hand: 'R', notes: 'C4:e:1 C4:e:1 | D4:q:2 C4:q:1 F4:q:4 | E4:h:3' }] } } },
+      { task: 'quiz', q: 'A song in <b>3/4</b> starts with a <b>1-beat</b> pickup. How many beats are in its last measure?', options: ['1', '2', '3'], answer: 1 },
+      { say: 'When a song has a pickup, count the beats that come <b>before</b> it: "<b>1, 2</b>… Hap-py". The game\'s count-in does this for you.' },
+      { say: 'This tune moves around the keyboard. On "birth-<b>day</b> dear", your hand jumps up so finger <b>5</b> lands on high C. Then finger <b>3 crosses over</b> the thumb, just like in the scale. Watch for <b>B♭</b> near the end!', show: { type: 'keys', keys: ['C5', 'A4', 'F4', 'E4', 'D4', 'Bb4'], fingers: [5, 4, 2, 1, 3, 4] } },
+      { task: 'tap', order: true, hint: true, q: 'Practice the tricky part: C A F E D, then jump to B♭.', targets: ['C5', 'A4', 'F4', 'E4', 'D4', 'Bb4'], fingers: [5, 4, 2, 1, 3, 4] },
+    ],
+    song: {
+      title: 'Happy Birthday to You', by: 'Mildred J. Hill & Patty Hill (1893)', time: [3, 4], pickup: 1, tempo: 96, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'C4:e:1 C4:e:1 | D4:q:2 C4:q:1 F4:q:4 | E4:h:3 C4:e:1 C4:e:1 | D4:q:2 C4:q:1 G4:q:5 | F4:h:4 C4:e:1 C4:e:1 | C5:q:5 A4:q:4 F4:q:2 | E4:q:1 D4:q:3 Bb4:e:4 Bb4:e:4 | A4:q:3 F4:q:1 G4:q:2 | F4:h:1' },
+        { hand: 'L', notes: 'r:q | F3:h.:1 | C3:h.:4 | C3:h. | F3:h.:1 | F3:h. | Bb2:h.:5 | C3:h.:4 | F3:h:1' },
+      ],
+    },
+    done: 'Every crystal in the geode is glowing like a birthday candle! Beyond it, three great <b>pillars</b> hold up the cave.',
+  },
+  {
+    id: 'r3-4', title: 'The Three Pillars', concept: 'Primary chords: I, IV, V7',
+    landmark: { type: 'pillars', x: 3300 }, reward: 'lanterns', meter: 'Each true performance lights a pillar.',
+    clue: 'Every key rests on <b>three pillars</b>: three chords that hold up almost every song. Find them!',
+    clueShort: 'Find the three stone pillars.',
+    early: 'Three stone pillars carved with the numbers I, IV and V. They are cold and dark.',
+    teach: [
+      { say: 'Every major key has three <b>primary chords</b>, built on the <b>1st</b>, <b>4th</b> and <b>5th</b> notes of its scale. We name them with Roman numerals: <b>I</b>, <b>IV</b> and <b>V7</b>. In the key of C they are <b>C</b>, <b>F</b> and <b>G7</b>.' },
+      { say: 'You already know <b>I</b> (the C chord: C E G) and <b>V7</b> (G7: B F G). For the <b>IV</b> chord, keep your pinky on C, put finger <b>2</b> on F and your thumb on A.', show: { type: 'keys', keys: ['C3', 'F3', 'A3'], fingers: [5, 2, 1], hands: ['L', 'L', 'L'] } },
+      { task: 'together', q: 'Play the <b>IV chord</b>: C, F and A together. Three times!', notes: ['C3', 'F3', 'A3'], fingers: [5, 2, 1], hands: ['L', 'L', 'L'], count: 3, praise: 'That\'s the IV chord!' },
+      { say: 'Listen to all three pillars: <b>I – IV – I – V7 – I</b>. Your fingers barely move!', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 80, notation: 'staff', voices: [{ hand: 'L', notes: 'C3+E3+G3:h:5+3+1 C3+F3+A3:h:5+2+1 | C3+E3+G3:h:5+3+1 B2+F3+G3:h:5+2+1 | C3+E3+G3:w:5+3+1' }] } } },
+      { task: 'quiz', q: 'In the key of C, which chord is <b>IV</b>?', options: ['C', 'F', 'G7'], answer: 1 },
+      { task: 'quiz', q: 'Which chord feels most like <b>home</b>, the one songs usually end on?', options: ['I', 'IV', 'V7'], answer: 0 },
+    ],
+    song: {
+      title: 'Three Pillars', by: 'Original', time: [4, 4], tempo: 84, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'E4:q:3 G4:q:5 E4:h:3 | F4:q:4 E4:q:3 F4:h:4 | G4:q:5 E4:q:3 C4:h:1 | D4:q:2 F4:q:4 D4:h:2 | E4:q:3 D4:q:2 E4:q:3 G4:q:5 | F4:q:4 E4:q:3 F4:q:4 C4:q:1 | D4:q:2 G4:q:5 F4:q:4 D4:q:2 | C4:w:1' },
+        { hand: 'L', notes: 'C3+E3+G3:w:5+3+1 | C3+F3+A3:w:5+2+1 | C3+E3+G3:w:5+3+1 | B2+F3+G3:w:5+2+1 | C3+E3+G3:w:5+3+1 | C3+F3+A3:w:5+2+1 | B2+F3+G3:w:5+2+1 | C3+E3+G3:w:5+3+1' },
+      ],
+    },
+    done: 'All three pillars are shining! Shhh… hanging from the ceiling up ahead, something is <b>sleeping</b>.',
+  },
+  {
+    id: 'r3-5', title: 'The Sleeping Bats', concept: 'Eighth-note pairs · Moving between hands',
+    landmark: { type: 'bats', x: 4100 }, reward: 'stars', meter: 'Each true performance wakes a bat.',
+    clue: 'Tiny bats are sleeping upside down. Are they sleeping? Let\'s find them and ring the <b>morning bells</b>!',
+    clueShort: 'Find the bats sleeping upside down.',
+    early: 'A row of little bats, fast asleep, hanging upside down.',
+    teach: [
+      { say: 'This song asks "<b>Are you sleeping?</b>" It\'s over 200 years old, and people sing it as a <b>round</b>: one group starts, and another begins the same tune two measures later.' },
+      { say: 'Watch for the quick <b>eighth-note pairs</b>: "<b>ti-ti ti-ti</b> ta ta". Two eighths fill one beat.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 88, notation: 'staff', voices: [{ hand: 'R', notes: 'G4:e A4:e G4:e F4:e E4:q C4:q' }] } } },
+      { task: 'rhythm', q: 'Tap the waking-up rhythm: "ti-ti ti-ti ta ta".', rhythm: 'e e e e q q | e e e e q q', time: [4, 4], tempo: 76 },
+      { say: 'At the end, the <b>morning bells</b> go "ding, dang, dong": the low <b>G</b> is played by your <b>left thumb</b>, so the tune passes between your hands.', show: { type: 'keys', keys: ['G3', 'C4'], fingers: [1, 1], hands: ['L', 'R'] } },
+    ],
+    song: {
+      title: 'Are You Sleeping? (Frère Jacques)', by: 'Traditional', time: [4, 4], tempo: 92, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'C4:q:1 D4:q:2 E4:q:3 C4:q:1 | C4:q:1 D4:q:2 E4:q:3 C4:q:1 | E4:q:3 F4:q:4 G4:h:5 | E4:q:3 F4:q:4 G4:h:5 | G4:e:4 A4:e:5 G4:e:4 F4:e:3 E4:q:2 C4:q:1 | G4:e:4 A4:e:5 G4:e:4 F4:e:3 E4:q:2 C4:q:1 | C4:q:1 G3:q:L1 C4:h:1 | C4:q:1 G3:q:L1 C4:h:1' },
+        { hand: 'L', notes: 'C3:w:5 | C3:w | C3:w | C3:w | C3:w | C3:w | r:w | r:w' },
+      ],
+    },
+    done: 'The bats wake up and swoop around, squeaking happily! Their wings brush a glittering blue <b>seam</b> in the rock.',
+  },
+  {
+    id: 'r3-6', title: 'The Sapphire Seam', concept: 'The G major scale · F♯ · I and V7 in G',
+    landmark: { type: 'seam', x: 4900 }, reward: 'crystal', meter: 'Each true performance lights the sapphire seam.',
+    clue: 'A vein of <b>sapphire</b> runs through the rock, and it hums in the key of <b>G</b>. Find it!',
+    clueShort: 'Find the glowing blue seam in the rock.',
+    early: 'A crack in the rock, full of dark blue stones.',
+    teach: [
+      { say: 'Let\'s build a scale starting on <b>G</b>. To keep the pattern <b>whole, whole, half</b> in both groups, one note must change: <b>F</b> becomes <b>F♯</b>. That gives the <b>G major scale</b>: G A B C D E F♯ G.', show: { type: 'keys', keys: ['G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F#5', 'G5'], fingers: [1, 2, 3, 1, 2, 3, 4, 5] } },
+      { task: 'tap', order: true, hint: true, q: 'Play the G major scale going up. Thumb under after B!', targets: ['G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F#5', 'G5'], fingers: [1, 2, 3, 1, 2, 3, 4, 5] },
+      { task: 'quiz', q: 'Which note is <b>sharp</b> in the G major scale?', options: ['C♯', 'F♯', 'G♯'], answer: 1 },
+      { say: 'In G, the <b>I</b> chord is <b>G B D</b> (fingers 5 3 1). The <b>V7</b> chord is <b>D7</b>: pinky slides down to <b>F♯</b>, finger 2 on <b>C</b>, and thumb stays on <b>D</b>.', show: { type: 'keys', keys: ['F#2', 'G2', 'B2', 'C3', 'D3'], hands: ['L', 'L', 'L', 'L', 'L'] } },
+      { task: 'together', q: 'Play the <b>I</b> chord in G: G, B and D together. Three times!', notes: ['G2', 'B2', 'D3'], fingers: [5, 3, 1], hands: ['L', 'L', 'L'], count: 3, praise: 'That\'s G!' },
+      { task: 'together', q: 'Now <b>V7</b> in G: F♯, C and D. Three times!', notes: ['F#2', 'C3', 'D3'], fingers: [5, 2, 1], hands: ['L', 'L', 'L'], count: 3, praise: 'That\'s D7!' },
+      { say: 'This is <b>Yankee Doodle</b>, sung since the 1700s. Your right hand shifts a few times. Follow the finger numbers, and look out for <b>F♯</b>!' },
+    ],
+    song: {
+      title: 'Yankee Doodle', by: 'Traditional', time: [4, 4], tempo: 104, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'G4:q:1 G4:q:1 A4:q:2 B4:q:3 | G4:q:1 B4:q:3 A4:q:2 D4:q:1 | G4:q:2 G4:q:2 A4:q:3 B4:q:4 | G4:h:2 F#4:h:1 | G4:q:2 G4:q:2 A4:q:3 B4:q:4 | C5:q:5 B4:q:4 A4:q:3 G4:q:2 | F#4:q:3 D4:q:1 E4:q:2 F#4:q:3 | G4:h:4 G4:h:4' },
+        { hand: 'L', notes: 'G2+B2+D3:w:5+3+1 | G2+B2+D3:w | G2+B2+D3:w | G2+B2+D3:h F#2+C3+D3:h:5+2+1 | G2+B2+D3:w:5+3+1 | G2+B2+D3:w | F#2+C3+D3:w:5+2+1 | G2+B2+D3:w:5+3+1' },
+      ],
+    },
+    done: 'The sapphire seam blazes blue! It leads down, down… to the deepest cave of all, where a still lake reflects the crystals like <b>stars</b>.',
+  },
+  {
+    id: 'r3-7', title: 'The Star Lake', concept: 'The damper pedal',
+    landmark: { type: 'starlake', x: 5700 }, reward: 'stars', meter: 'Each true performance lights the stars in the lake.',
+    clue: 'At the bottom of the caverns lies a lake so still it holds the crystal-light like <b>stars</b>. Its song must <b>ring</b> and <b>ring</b>.',
+    clueShort: 'Find the still lake at the bottom of the caverns.',
+    early: 'A black, still lake. Not a single star shines in it.',
+    teach: [
+      { say: 'The pedal on the <b>right</b> is the <b>damper pedal</b>. When it\'s down, the notes keep <b>ringing</b> even after you lift your fingers. Rest your heel on the floor and press with the ball of your foot.' },
+      { task: 'quiz', q: 'What does the damper pedal do?', options: ['Makes every note louder', 'Keeps notes ringing after you let go', 'Makes notes short'], answer: 1 },
+      { task: 'pedal', q: 'Pedal <b>down</b>, play C, E and G one at a time (let go of each), then pedal <b>up</b>. No pedal? Hold <kbd>Shift</kbd>.', notes: ['C3', 'E3', 'G3'], fingers: [5, 3, 1], hand: 'L' },
+      { say: 'Pedal marks sit under the staff. The line shows when the pedal is <b>down</b>. A little <b>notch</b> means lift and press again quickly: a <b>pedal change</b>. Change on each new chord, so the sounds don\'t blur. Listen!', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 76, notation: 'staff', voices: [{ hand: 'L', notes: 'C3:q:5:P E3:q:3 G3:h:1 | C3:q:5:P F3:q:2 A3:h:1 | B2:q:5:P F3:q:2 G3:h:1 | C3+E3+G3:w:5+3+1:P,*' }] } } },
+      { say: 'In this song your left hand plays the <b>I</b>, <b>IV</b> and <b>V7</b> chords one note at a time. Change the pedal at the start of every measure. Scoring only listens to the keys, so the pedal is for the sound.' },
+    ],
+    song: {
+      title: 'Star Lake', by: 'Original', time: [4, 4], tempo: 72, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'G4:h.:5:p E4:q:3 | F4:h.:4 C4:q:1 | D4:q:2 F4:q:4 G4:h:5 | E4:w:3 | G4:q:5:mp,< F4:q:4 E4:q:3 G4:q:5 | F4:q:4 E4:q:3 C4:h:1:mf,/ | D4:q:2:> E4:q:3 F4:q:4 D4:q:2 | C4:w:1:p,/' },
+        { hand: 'L', notes: 'C3:q:5:P E3:q:3 G3:h:1 | C3:q:5:P F3:q:2 A3:h:1 | B2:q:5:P F3:q:2 G3:h:1 | C3:q:5:P E3:q:3 G3:h:1 | C3:q:5:P E3:q:3 G3:h:1 | C3:q:5:P F3:q:2 A3:h:1 | B2:q:5:P F3:q:2 G3:h:1 | C3+E3+G3:w:5+3+1:P,*' },
+      ],
+    },
+    done: 'The lake fills with stars, and the whole of the Crystal Caverns is ringing! Far away, under the sea, something is <b>listening</b>… The path beyond is still forming.',
   },
 ];
 
@@ -507,9 +667,17 @@ const CURRICULUM = {
       lessons: REALM_2,
     },
     {
-      id: 'caverns', name: 'Crystal Caverns', level: 'Level 2', lessons: [],
-      planned: ['C and G major scales', 'Dotted quarter notes', 'Eighth notes in pairs', 'Primary chords I, IV, V7', 'F Position', 'Pickup notes', 'Damper pedal'],
-      plannedSongs: ['Happy Birthday', 'She\'ll Be Coming Round the Mountain', 'Yankee Doodle', 'London Bridge', 'Oh! Susanna'],
+      id: 'caverns', name: 'Crystal Caverns', level: 'Level 2', decor: 'cave', length: 6400, start: 250,
+      palette: {
+        silent: { skyTop: '#2d2c40', skyBot: '#5d5a74', far: '#4a4862', mid: '#46465c', near: '#3a3a4e', ground: '#323246', fog: '#5d5a74' },
+        awake: { skyTop: '#160f45', skyBot: '#5a3fc4', far: '#3a6fd8', mid: '#17a9a0', near: '#10897a', ground: '#0c7266', fog: '#a8eaff' },
+      },
+      intro: [
+        'Down, down into the <b>Crystal Caverns</b>. It\'s dark… but listen. The crystals <b>hum</b> when music is near.',
+        'Down here the songs grow bigger: whole <b>scales</b>, three <b>chords</b> that hold up every song, and even the <b>pedal</b>. Let\'s light up the caves!',
+      ],
+      lessons: REALM_3,
+      planned: ['More songs: She\'ll Be Coming \'Round the Mountain, Oh! Susanna'],
     },
     {
       id: 'harbor', name: 'Sunken Harbor', level: 'Level 3', lessons: [],

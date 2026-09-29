@@ -18,7 +18,11 @@ const Notation = (() => {
     const staff = song.notation === 'staff';
     const sp = (opts.sp || (W < 480 ? 7 : W < 760 ? 8.5 : 9.5)) * (staff ? 1 : 1.2);
     const bpm = song.beatsPerMeasure;
-    const nM = Math.max(1, Math.ceil(song.length / bpm - 1e-6));
+    const off = song.offset || 0; // a pickup bar is drawn as a short first measure
+    const nM = Math.max(1, Math.ceil((song.length + off) / bpm - 1e-6));
+    const wt = m => (m === 0 && off ? Math.max(0.45, (bpm - off) / bpm + 0.2) : 1);
+    // left edge of measure m within its system
+    const left = (s, m) => { let x = s.head; for (let k = s.start; k < m; k++) x += wt(k) * s.mW; return x; };
     const eighths = song.voices.some(v => v.events.some(e => e.dur < 1));
     const beatW = sp * (eighths ? 5.4 : 4.3);
     const pad = sp * 1.9;
@@ -35,7 +39,9 @@ const Notation = (() => {
     for (let s = 0, m = 0; m < nM; s++) {
       const count = Math.min(per, nM - m);
       const head = s ? clefW : headFirst;
-      systems.push({ start: m, count, head, mW: Math.min((W - head - 4) / per, mW0 * 1.8) });
+      // A pickup bar is narrower: it only holds a beat or two.
+      const units = per - (m === 0 ? 1 - wt(0) : 0);
+      systems.push({ start: m, count, head, mW: Math.min((W - head - 4) / units, mW0 * 1.8 * per / units) });
       m += count;
     }
     const sysH = staff ? sp * 23 : sp * 17;
@@ -48,17 +54,19 @@ const Notation = (() => {
 
     const sysIndex = m => systems.findIndex(s => m >= s.start && m < s.start + s.count);
     function beatX(b) {
-      const m = Math.min(nM - 1, Math.floor(b / bpm + 1e-6));
+      const bb = b + off;
+      const m = Math.min(nM - 1, Math.floor(bb / bpm + 1e-6));
       const si = sysIndex(m), s = systems[si];
-      const x0 = s.head + (m - s.start) * s.mW;
-      return { x: x0 + pad + (b - m * bpm) * ((s.mW - pad * 1.6) / bpm), si, s };
+      const x0 = left(s, m);
+      if (m === 0 && off) return { x: x0 + pad + b * ((wt(0) * s.mW - pad * 1.6) / (bpm - off)), si, s };
+      return { x: x0 + pad + (bb - m * bpm) * ((s.mW - pad * 1.6) / bpm), si, s };
     }
 
     // --- staves, clefs, bar lines
     systems.forEach((s, si) => {
       const y0 = si * sysH + sp * 0.5;
       s.y0 = y0;
-      const xEnd = s.head + s.count * s.mW;
+      const xEnd = left(s, s.start + s.count);
       let ya, yb;
       if (staff) {
         s.tt = y0 + sp * 4.5; s.bt = s.tt + sp * 10;
@@ -83,7 +91,7 @@ const Notation = (() => {
         ya = s.mid - sp * 6.5; yb = s.mid + sp * 6.5;
       }
       for (let k = 1; k <= s.count; k++) {
-        const x = s.head + k * s.mW;
+        const x = left(s, s.start + k);
         if (s.start + k === nM) {
           E('line', { x1: x - sp * 0.8, x2: x - sp * 0.8, y1: ya, y2: yb, class: 'bl' }, gStatic);
           E('rect', { x: x - sp * 0.45, y: ya, width: sp * 0.45, height: yb - ya, class: 'bl-thick' }, gStatic);
@@ -210,7 +218,7 @@ const Notation = (() => {
       const w = Math.max(sp * 0.9, x2 - x1), k = Math.min(sp * 1.4, w * 0.35);
       E('path', { d: `M${x1} ${y1} C${x1 + k} ${y1 + bow} ${x1 + w - k} ${y2 + bow} ${x1 + w} ${y2} C${x1 + w - k} ${y2 + bow * 0.72} ${x1 + k} ${y1 + bow * 0.72} ${x1} ${y1}Z`, class: cls }, gStatic);
     }
-    function sysEnd(s) { return s.head + s.count * s.mW - sp * 0.6; }
+    function sysEnd(s) { return left(s, s.start + s.count) - sp * 0.6; }
     function sysStart(s) { return s.head + sp * 0.4; }
     // Split a span across line breaks: calls fn(x1, x2, s, isFirst, isLast) once per system.
     function span(a, b, fn) {
@@ -264,6 +272,19 @@ const Notation = (() => {
         }
       });
     }
+
+    // Pedal marks: a bracket under the bass staff, notched where the pedal changes.
+    (song.pedals || []).forEach(([a, b]) => {
+      if (a >= song.length) return;
+      const A = beatX(a), B = beatX(Math.min(b, song.length) - 1e-3);
+      for (let si = A.si; si <= B.si; si++) {
+        const s = systems[si];
+        const y = staff ? s.bt + sp * 7.2 : s.mid + sp * 7.4;
+        const x1 = si === A.si ? A.x - rx : sysStart(s), x2 = si === B.si ? (b >= song.length ? sysEnd(s) : beatX(b).x - rx * 1.6) : sysEnd(s);
+        const d = `M${x1} ${y - sp * (si === A.si ? 1.2 : 0)} L${x1} ${y} L${x2} ${y}` + (si === B.si ? ` L${x2} ${y - sp * 1.2}` : '');
+        E('path', { d, class: 'pedal' }, gStatic);
+      }
+    });
 
     let curSys = -1;
     const api = {

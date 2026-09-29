@@ -422,3 +422,4 @@ b { font-weight: 800; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
 }
+.score-svg .pedal { fill: none; stroke: var(--ink-2); stroke-width: 1.6; stroke-linejoin: round; }

@@ -1,7 +1,8 @@
 'use strict';
 // All note input funnels through here: MIDI keyboards, the computer keyboard, and on-screen keys.
 const Input = (() => {
-  const subs = { down: new Set(), up: new Set() };
+  const subs = { down: new Set(), up: new Set(), pedal: new Set() };
+  let pedal = false;
   const held = new Map(); // midi -> source
   let midiState = 'Not connected yet';
   let midiConnected = false;
@@ -14,6 +15,9 @@ const Input = (() => {
     q: 60, 2: 61, w: 62, 3: 63, e: 64, r: 65, 5: 66, t: 67, 6: 68, y: 69, 7: 70, u: 71,
     i: 72, 9: 73, o: 74, 0: 75, p: 76, '[': 77, '=': 78, ']': 79,
   };
+  // Holding Shift (the pedal) changes what some keys type; map them back.
+  const UNSHIFT = { '@': '2', '#': '3', '%': '5', '^': '6', '&': '7', '(': '9', ')': '0', '<': ',', '>': '.', ':': ';', '?': '/', '{': '[', '}': ']', '+': '=' };
+  const noteFor = e => KEYMAP[UNSHIFT[e.key] || e.key.toLowerCase()];
   const REVERSE = {};
   for (const [k, m] of Object.entries(KEYMAP)) if (!(m in REVERSE) || m >= 60) REVERSE[m] = k.toUpperCase();
 
@@ -24,6 +28,13 @@ const Input = (() => {
     held.set(m, src);
     Sound.noteOn(m, vel);
     subs.down.forEach(fn => fn(m, vel, src));
+  }
+  // Damper pedal: MIDI controller 64, or Shift on the computer keyboard.
+  function setPedal(on, src = 'keys') {
+    if (on === pedal) return;
+    pedal = on;
+    Sound.setPedal(on);
+    subs.pedal.forEach(fn => fn(on, src));
   }
   function up(m, src = 'screen') {
     if (!held.has(m)) return;
@@ -37,8 +48,9 @@ const Input = (() => {
     return t && ((t.tagName === 'INPUT' && !['range', 'checkbox', 'radio'].includes(t.type)) || t.tagName === 'TEXTAREA' || t.isContentEditable);
   };
   window.addEventListener('keydown', e => {
+    if (e.key === 'Shift' && !typing(e)) { setPedal(true, 'keys'); return; }
     if (e.metaKey || e.ctrlKey || e.altKey || typing(e)) return;
-    const m = KEYMAP[e.key.toLowerCase()];
+    const m = noteFor(e);
     if (m === undefined) return;
     e.preventDefault();
     if (e.repeat) return;
@@ -46,10 +58,11 @@ const Input = (() => {
     down(m, 0.7, 'keys');
   });
   window.addEventListener('keyup', e => {
-    const m = KEYMAP[e.key.toLowerCase()];
+    if (e.key === 'Shift') { setPedal(false, 'keys'); return; }
+    const m = noteFor(e);
     if (m !== undefined) up(m, 'keys');
   });
-  window.addEventListener('blur', () => { for (const [m, src] of [...held]) if (src !== 'midi') up(m, src); });
+  window.addEventListener('blur', () => { for (const [m, src] of [...held]) if (src !== 'midi') up(m, src); setPedal(false); });
 
   function notify() { listeners.forEach(fn => fn()); }
   function initMidi() {
@@ -71,10 +84,12 @@ const Input = (() => {
     const cmd = st & 0xf0;
     if (cmd === 0x90 && v > 0) { Sound.init(); down(n, v / 127, 'midi'); }
     else if (cmd === 0x80 || (cmd === 0x90 && v === 0)) up(n, 'midi');
+    else if (cmd === 0xb0 && n === 64) setPedal(v >= 64, 'midi');
   }
 
   return {
-    on, down, up, initMidi,
+    on, down, up, initMidi, setPedal,
+    get pedal() { return pedal; },
     onStatus: fn => { listeners.add(fn); return () => listeners.delete(fn); },
     get midiState() { return midiState; },
     get midiConnected() { return midiConnected; },

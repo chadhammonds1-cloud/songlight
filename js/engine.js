@@ -8,7 +8,7 @@ class Performer {
 
   // A tied note lights up every notehead it spans.
   mark(n, cls) { this.score?.mark(n.glyph, cls); n.tied?.forEach(gl => this.score?.mark(gl, cls)); }
-  static sounding(n) { return n.dur * (n.stacc ? 0.4 : 0.92); }
+  static sounding(n) { return n.ring || n.dur * (n.stacc ? 0.4 : 0.92); }
 
   stop() {
     this.active = false;
@@ -85,11 +85,11 @@ class Performer {
     this.score?.clear();
     const song = this.song;
     const spb = 60 / (song.tempo * tempoScale), bpm = song.beatsPerMeasure;
-    const lead = 0.35, count = bpm;
+    const lead = 0.35, count = bpm + song.offset;
     const tA = ctx.currentTime + lead + count * spb;
     const tP = performance.now() + (lead + count * spb) * 1000;
     const endBeat = song.totalBeats;
-    for (let b = -count; b < (metronome ? endBeat : 0); b++) Sound.click(tA + b * spb, ((b % bpm) + bpm) % bpm === 0);
+    for (let b = -count; b < (metronome ? endBeat : 0); b++) Sound.click(tA + b * spb, (((b + song.offset) % bpm) + bpm) % bpm === 0);
     const req = [], auto = [];
     song.notes.forEach(n => (hands === 'both' || n.hand === hands ? req : auto).push(n));
     auto.forEach(n => Sound.play(n.midi, tA + n.beat * spb, Performer.sounding(n) * spb, (n.vel ?? 0.6) * 0.7));
@@ -128,7 +128,7 @@ class Performer {
       const t = now(), b = t / spb;
       if (b < 0) {
         const c = Math.ceil(-b);
-        if (c !== lastCount) { lastCount = c; onCount?.(count - c + 1, count); }
+        if (c !== lastCount) { lastCount = c; onCount?.((count - c) % bpm + 1, count); }
       } else if (lastCount !== 0) { lastCount = 0; onCount?.(0, count); }
       this.score?.setCursor(Math.max(0, b));
       req.forEach((n, i) => {

@@ -4,7 +4,9 @@
 //   duration w h. h q. q e
 //   finger   3, or L3 / R2 to set the hand for that note, chords as L5+1
 //   marks    comma-separated: a dynamic (pp p mp mf f), . staccato, ~ tie to the next note,
-//            ( slur start, ) slur end, < crescendo start, > diminuendo start, / hairpin end
+//            ( slur start, ) slur end, < crescendo start, > diminuendo start, / hairpin end,
+//            P pedal down (or change) at this note, * pedal up when this note ends
+// A song may start with a pickup: { pickup: 1 } means the first bar holds only 1 beat.
 //   "|" marks bar lines for readability only.
 const Music = (() => {
   const LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
@@ -12,7 +14,7 @@ const Music = (() => {
   const DUR = { w: 4, 'h.': 3, h: 2, 'q.': 1.5, q: 1, e: 0.5 };
   const NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
   const DYN = { pp: 0.3, p: 0.4, mp: 0.5, mf: 0.62, f: 0.76, ff: 0.88 };
-  const MARKS = new Set(['.', '~', '(', ')', '<', '>', '/']);
+  const MARKS = new Set(['.', '~', '(', ')', '<', '>', '/', 'P', '*']);
 
   function parsePitch(p) {
     const m = /^([A-G])(#|b)?(\d)$/.exec(p);
@@ -47,6 +49,7 @@ const Music = (() => {
         beat, dur: DUR[d], code: d, rest, pitches, fingers: ff ? ff.split('+').map(Number) : [], hand: h, dyn,
         stacc: marks.includes('.'), tie: marks.includes('~'), slur: marks.includes('(') ? 'start' : marks.includes(')') ? 'end' : '',
         hairpin: marks.includes('<') ? 'cresc' : marks.includes('>') ? 'dim' : marks.includes('/') ? 'end' : '',
+        pedal: marks.includes('P') ? 'down' : '', pedalUp: marks.includes('*'),
       });
       beat += DUR[d];
     }
@@ -99,11 +102,30 @@ const Music = (() => {
         });
       });
     });
+    // The damper pedal keeps every note ringing until it is lifted (or changed).
+    const pedals = [];
+    voices.forEach(v => {
+      let from = null;
+      v.events.forEach(e => {
+        if (e.pedal) { if (from !== null) pedals.push([from, e.beat]); from = e.beat; }
+        if (e.pedalUp && from !== null) { pedals.push([from, e.beat + e.dur]); from = null; }
+      });
+      if (from !== null) pedals.push([from, v.length]);
+    });
+    if (pedals.length) {
+      for (let pass = 1; pass < passes; pass++) pedals.slice().forEach(([a, b]) => pedals.push([a + pass * length, b + pass * length]));
+      notes.forEach(n => {
+        const p = pedals.find(([a, b]) => n.beat >= a - 1e-6 && n.beat < b - 1e-6);
+        if (p && p[1] > n.beat + n.dur) n.ring = p[1] - n.beat;
+      });
+    }
     notes.sort((a, b) => a.beat - b.beat || a.midi - b.midi);
     const mids = notes.map(n => n.midi);
     return {
       tempo: 80, time: [4, 4], notation: 'prestaff', ...def,
-      beatsPerMeasure: (def.time || [4, 4])[0], voices, length, totalBeats: length * passes, notes,
+      beatsPerMeasure: (def.time || [4, 4])[0], voices, length, totalBeats: length * passes, notes, pedals,
+      // beats of silence before the pickup, so bar lines and the count-in line up
+      offset: def.pickup ? (def.time || [4, 4])[0] - def.pickup : 0,
       lo: mids.length ? Math.min(...mids) : 60, hi: mids.length ? Math.max(...mids) : 72,
       hands: [...new Set(notes.map(n => n.hand))],
     };

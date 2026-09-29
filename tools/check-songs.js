@@ -29,7 +29,11 @@ function checkSong(where, def, { partialOk = false } = {}) {
     bars.forEach((bar, bi) => {
       const beats = bar.split(/\s+/).reduce((t, tok) => t + Music.DUR[tok.split(':')[1]], 0);
       const last = bi === bars.length - 1;
-      if (Math.abs(beats - bpm) > 1e-6 && !(partialOk && last && beats < bpm)) fail(where, `voice ${vi + 1}, bar ${bi + 1} has ${beats} beats (expected ${bpm})`);
+      // A pickup bar is short, and the last bar gives those beats back.
+      let want = bpm;
+      if (def.pickup && bi === 0) want = def.pickup;
+      else if (def.pickup && last) want = bpm - def.pickup;
+      if (Math.abs(beats - want) > 1e-6 && !(partialOk && last && beats < want)) fail(where, `voice ${vi + 1}, bar ${bi + 1} has ${beats} beats (expected ${want})`);
     });
     const evs = song.voices[vi].events;
     let slurOpen = false, pinOpen = false;
