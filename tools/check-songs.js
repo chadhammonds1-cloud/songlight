@@ -78,6 +78,7 @@ for (const realm of CURRICULUM.realms) {
       if (st.task === 'together') st.notes.forEach(k => pitchOk(w, k));
       if (st.task === 'touch') st.notes.forEach(k => pitchOk(w, k));
       if (st.task === 'read') st.notes.forEach(([k]) => pitchOk(w, k));
+      if (st.task === 'ear') st.items.forEach(it => { it.notes.forEach(k => pitchOk(w, k)); if (!st.choices.some(([v]) => v === it.answer)) fail(w, `answer "${it.answer}" is not a choice`); });
       if (st.task === 'interval') st.pairs.forEach(([a, b, ans]) => {
         pitchOk(w, a); pitchOk(w, b);
         if (st.choices && !st.choices.some(([v]) => v === ans)) fail(w, `answer "${ans}" is not one of the choices`);

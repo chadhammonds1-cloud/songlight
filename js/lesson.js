@@ -102,6 +102,7 @@ const LessonUI = (() => {
     tie: ['𝅗𝅥‿♩', 'Tied notes', '2 + 1 = 3 beats', 'ta – a – a', 3, [3]],
     'q.': ['♩.', 'Dotted quarter note', '1½ beats', 'ta – a – (ti)', 2, [1.5]],
     'q.e': ['♩. ♪', 'Dotted quarter + eighth', '2 beats together', 'ta – a – ti', 2, [1.5, 0.5]],
+    trip: ['♪♪♪³', 'Eighth-note triplet', '3 notes in 1 beat', 'tri – po – let', 1, [1 / 3, 1 / 3, 1 / 3]],
   };
 
   function renderShow(sh, w) {
@@ -144,7 +145,7 @@ const LessonUI = (() => {
         break;
       }
       case 'timesig':
-        add(w, `<div class="timesig"><div class="ts-num"><span>${sh.top}</span><span>${sh.bottom}</span></div><div class="ts-key"><p><b>${sh.top}</b> beats in every measure</p><p>a <b>quarter note</b> ♩ gets one beat</p></div></div>`);
+        add(w, `<div class="timesig"><div class="ts-num"><span>${sh.top}</span><span>${sh.bottom}</span></div><div class="ts-key">${(sh.lines || [`<b>${sh.top}</b> beats in every measure`, 'a <b>quarter note</b> ♩ gets one beat']).map(l => `<p>${l}</p>`).join('')}</div></div>`);
         break;
       case 'score': {
         const el = add(w, `<div class="snippet"><div class="score mini"></div>${sh.play ? '<button class="chip-btn play">▶ Listen</button>' : ''}</div>`);
@@ -291,7 +292,7 @@ const LessonUI = (() => {
       const host = $('.read-score', el), fb = feedback(w);
       const show = () => {
         const [p, hand] = st.notes[k];
-        Notation.render(host, Music.compile({ time: [4, 4], notation: 'staff', voices: [{ hand, notes: p + ':w' }] }), { hideTime: true, maxPerLine: 1, width: 240, sp: 11 });
+        Notation.render(host, Music.compile({ time: [4, 4], key: st.key, notation: 'staff', voices: [{ hand, notes: p + ':w' }] }), { hideTime: true, maxPerLine: 1, width: 260, sp: 11 });
       };
       listen('down', m => {
         if (k >= st.notes.length) return;
@@ -393,6 +394,28 @@ const LessonUI = (() => {
       });
     },
 
+    // Ear training: hear a chord or pair of notes and name it. items: [{ notes: [...], answer, broken? }]
+    ear(st, w, done) {
+      let k = 0, order = st.items.map((_, i) => i).sort(() => Math.random() - 0.5);
+      const el = add(w, `<div class="hl"><button class="chip-btn again">▶ Hear it again</button>
+        <div class="choices">${st.choices.map(([v, label]) => `<button class="choice" data-v="${v}">${label}</button>`).join('')}</div>
+        <div class="pips big">${pips(st.items.length, 0)}</div></div>`);
+      const fb = feedback(w);
+      const play = () => {
+        const it = st.items[order[k]], t = Sound.init().currentTime + 0.08;
+        it.notes.map(Music.midi).forEach((m, i) => { const at = t + (it.broken || st.broken ? i * 0.28 : 0); Sound.play(m, at, 1.3, 0.6); });
+      };
+      $('.again', el).onclick = play;
+      el.querySelectorAll('.choice').forEach(btn => btn.onclick = () => {
+        if (k >= st.items.length) return;
+        if (btn.dataset.v === st.items[order[k]].answer) {
+          k++; $('.pips', el).innerHTML = pips(st.items.length, k);
+          if (k >= st.items.length) { fb(st.praise || 'Great ears!'); done(); } else { fb(praise() + ' Here comes another…'); later(play, 900); }
+        } else { fb(st.hint || 'Listen again…'); Sound.chime('no'); later(play, 500); }
+      });
+      later(play, 300);
+    },
+
     dyn(st, w, done) {
       let step = 0;
       const el = add(w, `<div class="dyn-row"><span class="dchip" data-d="f"><i>f</i> loud</span><span class="dchip" data-d="p"><i>p</i> soft</span></div><div class="vel"><span></span></div>`);
@@ -472,7 +495,7 @@ const LessonUI = (() => {
           <div class="song-meta">
             <p class="kicker">${song.by === 'Original' ? 'Original song' : song.by === 'Traditional' ? 'Traditional song' : 'Public domain · ' + song.by}</p>
             <h3>${song.title}</h3>
-            <p class="meta">${song.time[0]}/${song.time[1]} time · ♩ = ${song.tempo}${song.repeat ? ' · play twice' : ''}</p>
+            <p class="meta">${song.time[0]}/${song.time[1]} time · ${song.pulse === 1.5 ? '♩.' : '♩'} = ${song.tempo}${song.repeat ? ' · play twice' : ''}</p>
           </div>
           <div class="reward-box">
             <canvas class="reward" aria-hidden="true"></canvas>
@@ -531,7 +554,7 @@ const LessonUI = (() => {
     body.querySelectorAll('.hands [data-h]').forEach(b => b.onclick = () => { stopRun(); hands = b.dataset.h; refresh(); });
     tempo.oninput = () => { $('.tempo output', body).textContent = tempo.value + '%'; };
 
-    const onCount = (c, total) => { cnt.textContent = c ? c : ''; cnt.classList.toggle('on', !!c); if (c === 1) setStatus(`Count in: ${total} clicks, then play.`); if (!c) setStatus(''); };
+    const onCount = (c, total) => { cnt.textContent = c ? c : ''; cnt.classList.toggle('on', !!c); if (c === 1) setStatus('Count along with the clicks, then play.'); if (!c) setStatus(''); };
 
     go.onclick = () => {
       if (go.classList.contains('running')) { stopRun(); setStatus('Stopped.'); return; }

@@ -27,7 +27,7 @@ class Performer {
     if (!ctx) return;
     this.active = true;
     this.score?.clear();
-    const spb = 60 / (this.song.tempo * tempoScale);
+    const spb = this.song.spq / tempoScale;
     const t0 = ctx.currentTime + 0.3, p0 = performance.now() + 300;
     this.song.notes.forEach(n => Sound.play(n.midi, t0 + n.beat * spb, Performer.sounding(n) * spb, n.vel ?? 0.6));
     const loop = () => {
@@ -84,12 +84,18 @@ class Performer {
     this.active = true;
     this.score?.clear();
     const song = this.song;
-    const spb = 60 / (song.tempo * tempoScale), bpm = song.beatsPerMeasure;
-    const lead = 0.35, count = bpm + song.offset;
+    const spb = song.spq / tempoScale, bpm = song.beatsPerMeasure, pulse = song.pulse, off = song.offset;
+    const perBar = Math.round(bpm / pulse);
+    const lead = 0.35, count = bpm + off; // one full bar, plus the rest of the pickup bar
     const tA = ctx.currentTime + lead + count * spb;
     const tP = performance.now() + (lead + count * spb) * 1000;
     const endBeat = song.totalBeats;
-    for (let b = -count; b < (metronome ? endBeat : 0); b++) Sound.click(tA + b * spb, (((b + song.offset) % bpm) + bpm) % bpm === 0);
+    // Clicks fall on the pulse of the bar grid (u), which a pickup shifts against song time (b).
+    for (let k = -perBar; ; k++) {
+      const u = k * pulse, b = u - off;
+      if (b >= (metronome ? endBeat : 0) - 1e-6) break;
+      Sound.click(tA + b * spb, ((k % perBar) + perBar) % perBar === 0);
+    }
     const req = [], auto = [];
     song.notes.forEach(n => (hands === 'both' || n.hand === hands ? req : auto).push(n));
     auto.forEach(n => Sound.play(n.midi, tA + n.beat * spb, Performer.sounding(n) * spb, (n.vel ?? 0.6) * 0.7));
@@ -127,9 +133,9 @@ class Performer {
       if (!this.active) return;
       const t = now(), b = t / spb;
       if (b < 0) {
-        const c = Math.ceil(-b);
-        if (c !== lastCount) { lastCount = c; onCount?.((count - c) % bpm + 1, count); }
-      } else if (lastCount !== 0) { lastCount = 0; onCount?.(0, count); }
+        const k = Math.floor((b + off) / pulse + 1e-6);
+        if (k !== lastCount) { lastCount = k; onCount?.(((k % perBar) + perBar) % perBar + 1, perBar * 2); }
+      } else if (lastCount !== 'go') { lastCount = 'go'; onCount?.(0, perBar * 2); }
       this.score?.setCursor(Math.max(0, b));
       req.forEach((n, i) => {
         if (state[i] === 'pending' && n.beat * spb + win < t) { state[i] = 'miss'; this.mark(n, 'miss'); }

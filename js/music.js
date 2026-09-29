@@ -1,17 +1,22 @@
 'use strict';
 // Song parsing. Voice strings are tokens of  pitch:duration[:finger[:marks]]
 //   pitch    C4, F#3, Bb4, chords as C3+G3, rest as r
-//   duration w h. h q. q e
+//   duration w h. h q. q e, and t for one note of an eighth-note triplet (⅓ beat)
 //   finger   3, or L3 / R2 to set the hand for that note, chords as L5+1
 //   marks    comma-separated: a dynamic (pp p mp mf f), . staccato, ~ tie to the next note,
 //            ( slur start, ) slur end, < crescendo start, > diminuendo start, / hairpin end,
 //            P pedal down (or change) at this note, * pedal up when this note ends
 // A song may start with a pickup: { pickup: 1 } means the first bar holds only 1 beat.
+// Beats are always counted in quarter notes, so a 6/8 bar is 3 beats long. Its tempo counts
+// the dotted-quarter pulse, the way musicians feel 6/8.
+// { key: 'G' } draws a key signature; notes written F#4 then need no sign of their own.
 //   "|" marks bar lines for readability only.
 const Music = (() => {
   const LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
   const SEMI = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-  const DUR = { w: 4, 'h.': 3, h: 2, 'q.': 1.5, q: 1, e: 0.5 };
+  const DUR = { w: 4, 'h.': 3, h: 2, 'q.': 1.5, q: 1, 'e.': 0.75, e: 0.5, t: 1 / 3 };
+  // sharps (+) or flats (−) in each key signature
+  const KEYS = { C: 0, G: 1, D: 2, A: 3, E: 4, F: -1, Bb: -2, Eb: -3, Am: 0, Em: 1, Bm: 2, Dm: -1, Gm: -2, Cm: -3 };
   const NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
   const DYN = { pp: 0.3, p: 0.4, mp: 0.5, mf: 0.62, f: 0.76, ff: 0.88 };
   const MARKS = new Set(['.', '~', '(', ')', '<', '>', '/', 'P', '*']);
@@ -121,11 +126,17 @@ const Music = (() => {
     }
     notes.sort((a, b) => a.beat - b.beat || a.midi - b.midi);
     const mids = notes.map(n => n.midi);
+    const [top, bottom] = def.time || [4, 4];
+    const bar = top * 4 / bottom;
+    const pulse = bottom === 8 && top % 3 === 0 ? 1.5 : 4 / bottom; // felt beat, in quarter notes
+    const tempo = def.tempo || 80;
+    if (def.key && !(def.key in KEYS)) throw new Error('Unknown key ' + def.key);
     return {
       tempo: 80, time: [4, 4], notation: 'prestaff', ...def,
-      beatsPerMeasure: (def.time || [4, 4])[0], voices, length, totalBeats: length * passes, notes, pedals,
+      beatsPerMeasure: bar, pulse, spq: 60 / (tempo * pulse), keySig: KEYS[def.key] || 0,
+      voices, length, totalBeats: length * passes, notes, pedals,
       // beats of silence before the pickup, so bar lines and the count-in line up
-      offset: def.pickup ? (def.time || [4, 4])[0] - def.pickup : 0,
+      offset: def.pickup ? bar - def.pickup : 0,
       lo: mids.length ? Math.min(...mids) : 60, hi: mids.length ? Math.max(...mids) : 72,
       hands: [...new Set(notes.map(n => n.hand))],
     };
@@ -142,5 +153,13 @@ const Music = (() => {
     return out;
   }
 
-  return { parsePitch, midi, isBlack, letterOf, nameOf, compile, groups, DUR, DYN, pc };
+    // Which letters a key signature alters: { F: '#' } for G major.
+  function keyAccidentals(n) {
+    const out = {};
+    if (n > 0) 'FCGDAEB'.slice(0, n).split('').forEach(l => { out[l] = '#'; });
+    if (n < 0) 'BEADGCF'.slice(0, -n).split('').forEach(l => { out[l] = 'b'; });
+    return out;
+  }
+
+  return { parsePitch, midi, isBlack, letterOf, nameOf, compile, groups, keyAccidentals, DUR, DYN, KEYS, pc };
 })();

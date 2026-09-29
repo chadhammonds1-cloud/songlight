@@ -28,7 +28,8 @@ const Notation = (() => {
     const pad = sp * 1.9;
     const mW0 = bpm * beatW + pad * 1.4;
     const showTime = !opts.hideTime;
-    const clefW = staff ? sp * 4.4 : sp * 1;
+    const keyAcc = staff ? Music.keyAccidentals(song.keySig || 0) : {};
+    const clefW = (staff ? sp * 4.4 : sp * 1) + (staff ? Math.abs(song.keySig || 0) * sp * 1.1 : 0);
     const headFirst = clefW + (showTime ? sp * 2.8 : 0);
     const maxPer = opts.maxPerLine || 4;
 
@@ -44,7 +45,7 @@ const Notation = (() => {
       systems.push({ start: m, count, head, mW: Math.min((W - head - 4) / units, mW0 * 1.8 * per / units) });
       m += count;
     }
-    const sysH = staff ? sp * 23 : sp * 17;
+    const sysH = staff ? sp * 25 : sp * 17;
     const H = systems.length * sysH + sp;
     const svg = E('svg', { width: W, height: H, viewBox: `0 0 ${W} ${H}`, class: 'score-svg ' + (staff ? 'is-staff' : 'is-prestaff') }, host);
     const gStatic = E('g', {}, svg);
@@ -74,9 +75,19 @@ const Notation = (() => {
         E('line', { x1: 2, x2: 2, y1: s.tt, y2: s.bt + 4 * sp, class: 'bl' }, gStatic);
         T('𝄞', { x: sp * 0.5, y: s.tt + sp * 3, class: 'clef', 'font-size': sp * 4 }, gStatic);
         T('𝄢', { x: sp * 0.6, y: s.bt + sp * 1, class: 'clef', 'font-size': sp * 4 }, gStatic);
+        // key signature: sharps F C G D A E B, flats B E A D G C F, at their usual heights
+        const ks = song.keySig || 0;
+        const SHARP_T = [38, 35, 39, 36, 33, 37, 34], FLAT_T = [34, 37, 33, 36, 32, 35, 31];
+        for (let i = 0; i < Math.abs(ks); i++) {
+          const dT = (ks > 0 ? SHARP_T : FLAT_T)[i];
+          [[s.tt, dT, 30], [s.bt, dT - 14, 18]].forEach(([top, dia, bottom]) => {
+            const y = top + 4 * sp - (dia - bottom) * sp / 2;
+            T(ks > 0 ? '♯' : '♭', { x: sp * 4.6 + i * sp * 1.1, y: y + sp * 0.6, class: 'acc keysig', 'font-size': sp * 2.1, 'text-anchor': 'middle' }, gStatic);
+          });
+        }
         if (si === 0 && showTime) {
           for (const top of [s.tt, s.bt]) {
-            T(bpm, { x: clefW + sp * 1.2, y: top + sp * 1.9, class: 'ts', 'font-size': sp * 2.5, 'text-anchor': 'middle' }, gStatic);
+            T(song.time[0], { x: clefW + sp * 1.2, y: top + sp * 1.9, class: 'ts', 'font-size': sp * 2.5, 'text-anchor': 'middle' }, gStatic);
             T(song.time[1], { x: clefW + sp * 1.2, y: top + sp * 3.9, class: 'ts', 'font-size': sp * 2.5, 'text-anchor': 'middle' }, gStatic);
           }
         }
@@ -85,7 +96,7 @@ const Notation = (() => {
         s.mid = y0 + sp * 8.5;
         E('line', { x1: s.head - sp * 0.4, x2: xEnd, y1: s.mid, y2: s.mid, class: 'midline' }, gStatic);
         if (si === 0 && showTime) {
-          T(bpm, { x: sp * 1.9, y: s.mid - sp * 0.5, class: 'ts', 'font-size': sp * 2.5, 'text-anchor': 'middle' }, gStatic);
+          T(song.time[0], { x: sp * 1.9, y: s.mid - sp * 0.5, class: 'ts', 'font-size': sp * 2.5, 'text-anchor': 'middle' }, gStatic);
           T(song.time[1], { x: sp * 1.9, y: s.mid + sp * 2.1, class: 'ts', 'font-size': sp * 2.5, 'text-anchor': 'middle' }, gStatic);
         }
         ya = s.mid - sp * 6.5; yb = s.mid + sp * 6.5;
@@ -134,17 +145,25 @@ const Notation = (() => {
     const stemLen = staff ? sp * 3.4 : sp * 2.8;
     song.voices.forEach((v, vi) => {
       const evs = v.events;
-      // Beam pairs of eighth notes that share a beat.
+      // Beam short notes that share a beat (a dotted-quarter pulse in 6/8), triplets in threes.
       const beams = [];
-      for (let i = 0; i < evs.length - 1; i++) {
-        const a = evs[i], b = evs[i + 1];
-        if (a.dur === 0.5 && b.dur === 0.5 && !a.rest && !b.rest && a.hand === b.hand && Math.abs(a.beat % 1) < 1e-6 && Math.abs(b.beat - a.beat - 0.5) < 1e-6) {
-          const all = [...a.pitches, ...b.pitches];
-          const up = staff ? all.reduce((t, p) => t + p.dia, 0) / all.length < (a.hand === 'L' ? 22 : 34) : a.hand !== 'L';
-          a.beamDir = b.beamDir = up; a.beamed = b.beamed = true;
-          beams.push([a, b]);
-          i++;
+      const unit = song.pulse || 1;
+      for (let i = 0; i < evs.length; i++) {
+        const a = evs[i];
+        if (a.rest || a.dur >= 1 || a.dur === 0.75) continue;
+        const cell = Math.floor((a.beat + (song.offset || 0)) / unit + 1e-6);
+        const grp = [a];
+        for (let j = i + 1; j < evs.length; j++) {
+          const b = evs[j];
+          if (b.rest || b.dur >= 1 || b.dur === 0.75 || b.hand !== a.hand || Math.floor((b.beat + (song.offset || 0)) / unit + 1e-6) !== cell) break;
+          grp.push(b);
         }
+        if (grp.length < 2) continue;
+        const all = grp.flatMap(e => e.pitches);
+        const up = staff ? all.reduce((t, p) => t + p.dia, 0) / all.length < (a.hand === 'L' ? 22 : 34) : a.hand !== 'L';
+        grp.forEach(e => { e.beamDir = up; e.beamed = true; });
+        beams.push(grp);
+        i += grp.length - 1;
       }
       evs.forEach((e, ei) => {
         const { x, s, si } = beatX(e.beat);
@@ -161,10 +180,22 @@ const Notation = (() => {
         else up = hand !== 'L';
         e._ys = ys; e._up = up;
         const hollow = e.dur >= 2;
+        // Notes a step apart in a chord can't share a spot: one moves to the other side of the stem.
+        const dx = e.pitches.map(() => 0);
+        if (staff && e.pitches.length > 1) {
+          const order = e.pitches.map((p, i) => i).sort((a, b) => e.pitches[a].dia - e.pitches[b].dia);
+          for (let k = 1; k < order.length; k++) {
+            const lo = order[k - 1], hi = order[k];
+            if (e.pitches[hi].dia - e.pitches[lo].dia === 1 && !dx[lo] && !dx[hi]) {
+              if (up || e.dur >= 4) dx[hi] = rx * 1.84; else dx[lo] = -rx * 1.84;
+            }
+          }
+        }
         e.pitches.forEach((p, i) => {
-          const y = ys[i];
+          const y = ys[i], x = e._x + dx[i];
           E('ellipse', { cx: x, cy: y, rx, ry, transform: `rotate(-18 ${x} ${y})`, class: 'head' + (hollow ? ' hollow' : '') }, g);
-          if (p.acc) T(ACC[p.acc], { x: x - rx - sp * 0.8, y: y + sp * 0.55, class: 'acc', 'font-size': sp * 2, 'text-anchor': 'middle' }, g);
+          const want = keyAcc[p.letter] || '';
+          if (staff ? p.acc !== want : p.acc) T(p.acc ? ACC[p.acc] : '♮', { x: x - rx - sp * 0.8, y: y + sp * 0.55, class: 'acc', 'font-size': sp * 2, 'text-anchor': 'middle' }, g);
           if (e.code.endsWith('.')) {
             const dy = staff && onLine(p.dia, hand) ? -sp / 2 : 0;
             E('circle', { cx: x + rx + sp * 0.6, cy: y + dy, r: sp * (staff ? 0.22 : 0.28), class: 'dot' }, g);
@@ -183,7 +214,7 @@ const Notation = (() => {
           const y2 = up ? yTop - stemLen : yBot + stemLen;
           e._stemEl = E('line', { x1: sx, x2: sx, y1: up ? yBot : yTop, y2, class: 'stem' }, g);
           e._stem = { x: sx, y: y2, up };
-          if (e.dur === 0.5 && !e.beamed) {
+          if (e.dur < 1 && !e.beamed) {
             const d = up ? `M${sx} ${y2} q${sp * 0.3} ${sp * 1.4} ${sp * 1.3} ${sp * 1.9} q${sp * 0.6} ${sp * 0.6} ${sp * 0.1} ${sp * 1.5}` : `M${sx} ${y2} q${sp * 0.3} ${-sp * 1.4} ${sp * 1.3} ${-sp * 1.9} q${sp * 0.6} ${-sp * 0.6} ${sp * 0.1} ${-sp * 1.5}`;
             E('path', { d, class: 'flag' }, g);
           }
@@ -202,13 +233,19 @@ const Notation = (() => {
           T(e.dyn, { x: x - rx * 2.2, y: dy, class: 'dyn', 'font-size': sp * 1.9, 'text-anchor': 'end' }, gStatic);
         }
       });
-      for (const [a, b] of beams) {
-        if (!a._stem || !b._stem) continue;
-        const up = a._stem.up;
-        const yb = up ? Math.min(a._stem.y, b._stem.y) : Math.max(a._stem.y, b._stem.y);
-        a._stemEl.setAttribute('y2', yb); b._stemEl.setAttribute('y2', yb);
+      for (const grp of beams) {
+        if (grp.some(e => !e._stem)) continue;
+        const a = grp[0], b = grp[grp.length - 1], up = a._stem.up;
+        const yb = up ? Math.min(...grp.map(e => e._stem.y)) : Math.max(...grp.map(e => e._stem.y));
+        grp.forEach(e => e._stemEl.setAttribute('y2', yb));
         const th = sp * 0.5 * (up ? 1 : -1);
         E('polygon', { points: `${a._stem.x},${yb} ${b._stem.x},${yb} ${b._stem.x},${yb + th} ${a._stem.x},${yb + th}`, class: 'beam' }, gNotes);
+        // The triplet 3 goes on the notehead side, clear of the finger numbers above the beam.
+        if (grp.some(e => e.code === 't')) {
+          const heads = grp.flatMap(e => e._ys);
+          const y = up ? Math.max(...heads) + sp * 2.3 : Math.min(...heads) - sp * 1.3;
+          T('3', { x: (a._x + b._x) / 2, y, class: 'tuplet', 'font-size': sp * 1.4, 'text-anchor': 'middle' }, gNotes);
+        }
       }
       curves(evs);
     });

@@ -635,7 +635,168 @@ const REALM_3 = [
         { hand: 'L', notes: 'C3:q:5:P E3:q:3 G3:h:1 | C3:q:5:P F3:q:2 A3:h:1 | B2:q:5:P F3:q:2 G3:h:1 | C3:q:5:P E3:q:3 G3:h:1 | C3:q:5:P E3:q:3 G3:h:1 | C3:q:5:P F3:q:2 A3:h:1 | B2:q:5:P F3:q:2 G3:h:1 | C3+E3+G3:w:5+3+1:P,*' },
       ],
     },
-    done: 'The lake fills with stars, and the whole of the Crystal Caverns is ringing! Far away, under the sea, something is <b>listening</b>… The path beyond is still forming.',
+    done: 'The lake fills with stars, and the whole of the Crystal Caverns is ringing! Far away, under the sea, something is <b>listening</b>… Open the map: the <b>Sunken Harbor</b> is rising from the mist.',
+  },
+];
+
+const REALM_4 = [
+  {
+    id: 'r4-1', title: 'The Lighthouse', concept: 'Key signatures · G major & F major',
+    landmark: { type: 'lighthouse', x: 900 }, reward: 'stars', meter: 'Each true performance lights the lamp a little brighter.',
+    clue: 'Ships can\'t find the harbor in the dark. The <b>lighthouse</b> at the end of the pier needs a song to light its lamp.',
+    clueShort: 'Find the lighthouse at the end of the pier.',
+    early: 'A tall lighthouse, its great lamp cold and dark.',
+    teach: [
+      { say: 'Remember the G major scale needed <b>F♯</b>? Instead of writing a sharp on every F, music puts it once at the very start of each line: a <b>key signature</b>.', show: { type: 'score', song: { time: [4, 4], key: 'G', notation: 'staff', voices: [{ hand: 'R', notes: 'G4:q A4:q B4:q C5:q | D5:q E5:q F#5:q G5:q' }] } } },
+      { say: 'One sharp, on the F line, means: <b>every F is F♯</b>, in every octave, all the way through. That\'s the key of <b>G major</b>.' },
+      { say: 'One <b>flat</b>, on the B line, means <b>every B is B♭</b>. That\'s the key of <b>F major</b>. Its scale is F G A B♭ C D E F.', show: { type: 'score', play: true, song: { time: [4, 4], key: 'F', tempo: 100, notation: 'staff', voices: [{ hand: 'R', notes: 'F4:q G4:q A4:q Bb4:q | C5:q D5:q E5:q F5:q' }] } } },
+      { task: 'quiz', q: 'The key signature has one sharp on the F line. You see an F. You play…', options: ['F', 'F♯', 'F♭'], answer: 1 },
+      { task: 'quiz', q: 'Which key has <b>one flat</b> (B♭)?', options: ['G major', 'C major', 'F major'], answer: 2 },
+      { task: 'read', q: 'The key is G major. Read each note and play it. Remember the sharp!', notes: [['F#4', 'R'], ['G4', 'R'], ['F#5', 'R'], ['D4', 'R']], key: 'G' },
+    ],
+    song: {
+      title: 'Harbor Light', by: 'Original', time: [4, 4], key: 'G', tempo: 88, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'G4:q:4 F#4:q:3 E4:q:2 D4:q:1 | E4:q:2 F#4:q:3 G4:h:4 | A4:q:5 G4:q:4 F#4:q:3 E4:q:2 | F#4:w:3 | G4:q:4 A4:q:5 G4:q:4 F#4:q:3 | E4:q:2 F#4:q:3 D4:h:1 | E4:q:2 F#4:q:3 A4:q:5 F#4:q:3 | G4:w:4' },
+        { hand: 'L', notes: 'G2+B2+D3:w:5+3+1 | G2+B2+D3:w | F#2+C3+D3:w:5+2+1 | F#2+C3+D3:w | G2+B2+D3:w:5+3+1 | F#2+C3+D3:w:5+2+1 | F#2+C3+D3:w | G2+B2+D3:w:5+3+1' },
+      ],
+    },
+    done: 'The lamp blazes and sweeps across the water! In its light you can see rock pools, some <b>bright</b> and some <b>shadowy</b>.',
+  },
+  {
+    id: 'r4-2', title: 'The Tide Pools', concept: 'Major & minor triads',
+    landmark: { type: 'tidepools', x: 1700 }, reward: 'flower', meter: 'Each true performance opens an anemone.',
+    clue: 'Down on the rocks are two kinds of pools: some sound <b>bright and happy</b>, some <b>dark and thoughtful</b>. Find the tide pools.',
+    clueShort: 'Find the tide pools on the rocks.',
+    early: 'Rock pools full of closed-up anemones.',
+    teach: [
+      { say: 'A <b>triad</b> is a three-note chord built in <b>3rds</b>: a root, a 3rd and a 5th. C E G is a <b>C major</b> triad. It sounds bright.', show: { type: 'keys', keys: ['C4', 'E4', 'G4'], fingers: [1, 3, 5] } },
+      { say: 'Lower the <b>middle</b> note by a half step and the whole chord changes mood: C E♭ G is a <b>C minor</b> triad. It sounds darker, more thoughtful. Listen to both!', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 60, notation: 'staff', voices: [{ hand: 'R', notes: 'C4+E4+G4:h:1+3+5 C4+Eb4+G4:h:1+3+5' }] } } },
+      { task: 'together', q: 'Play <b>C minor</b>: C, E♭ and G together, three times.', notes: ['C4', 'Eb4', 'G4'], fingers: [1, 3, 5], hands: ['R', 'R', 'R'], count: 3, praise: 'That\'s C minor!' },
+      { task: 'ear', q: 'Listen. Is the chord <b>major</b> (bright) or <b>minor</b> (dark)?', choices: [['major', 'Major ☀'], ['minor', 'Minor ☾']], hint: 'Listen to the middle note. Bright or shadowy?', praise: 'You can hear major and minor!', items: [
+        { notes: ['C4', 'E4', 'G4'], answer: 'major' }, { notes: ['C4', 'Eb4', 'G4'], answer: 'minor' }, { notes: ['D4', 'F4', 'A4'], answer: 'minor' },
+        { notes: ['F4', 'A4', 'C5'], answer: 'major' }, { notes: ['A3', 'C4', 'E4'], answer: 'minor' }, { notes: ['G3', 'B3', 'D4'], answer: 'major' },
+      ] },
+      { say: 'In this song your right hand plays triads that flip between <b>major</b> and <b>minor</b>, one finger moving just a half step each time.' },
+    ],
+    song: {
+      title: 'Two Moods', by: 'Original', time: [4, 4], tempo: 76, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'C4+E4+G4:h:1+3+5 C4+Eb4+G4:h:1+3+5 | C4+E4+G4:w:1+3+5 | D4+F#4+A4:h:1+3+5 D4+F4+A4:h:1+3+5 | D4+F4+A4:w:1+3+5 | E4+G4+B4:h:1+3+5 E4+G#4+B4:h:1+3+5 | E4+G#4+B4:w:1+3+5 | C4+Eb4+G4:h:1+3+5 C4+E4+G4:h:1+3+5 | C4+E4+G4:w:1+3+5' },
+        { hand: 'L', notes: 'C3:w:5 | C3:w:5 | D3:w:4 | D3:w:4 | E3:w:3 | E3:w:3 | C3:w:5 | C3:w:5' },
+      ],
+    },
+    done: 'The anemones open in every colour! Out on the water, a lonely <b>foghorn</b> is calling in a minor key…',
+  },
+  {
+    id: 'r4-3', title: 'The Foghorn', concept: 'A minor · Harmonic minor · i and V7',
+    landmark: { type: 'foghorn', x: 2500 }, reward: 'lanterns', meter: 'Each true performance clears some of the fog.',
+    clue: 'A deep, sad sound drifts through the fog: the <b>foghorn</b>. Its song is in a <b>minor</b> key.',
+    clueShort: 'Follow the sound of the foghorn.',
+    early: 'An old brass foghorn on a post, wrapped in thick grey fog.',
+    teach: [
+      { say: 'Every major key has a <b>relative minor</b> that shares its key signature. Count down three half steps from C and you reach <b>A</b>. So <b>A minor</b> uses only white keys, just like C major, but it feels like home on A.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 100, notation: 'staff', voices: [{ hand: 'R', notes: 'A3:q B3:q C4:q D4:q | E4:q F4:q G4:q A4:q' }] } } },
+      { task: 'quiz', q: 'Which minor key shares the key signature of <b>C major</b>?', options: ['A minor', 'D minor', 'E minor'], answer: 0 },
+      { say: 'Songs in minor often raise the <b>7th</b> note by a half step, so it leans hard toward home. In A minor, G becomes <b>G♯</b>. This is the <b>harmonic minor</b> scale. Hear the difference in the last notes!', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 100, notation: 'staff', voices: [{ hand: 'R', notes: 'A3:q B3:q C4:q D4:q | E4:q F4:q G#4:q A4:q' }] } } },
+      { say: 'Minor chords get <b>lowercase</b> numerals. In A minor, <b>i</b> is A C E. <b>V7</b> is E7, and in your left hand it\'s G♯, D and E (fingers 5 2 1).', show: { type: 'keys', keys: ['G#2', 'A2', 'C3', 'D3', 'E3'], hands: ['L', 'L', 'L', 'L', 'L'] } },
+      { task: 'together', q: 'Play <b>i</b> in A minor: A, C, E. Three times!', notes: ['A2', 'C3', 'E3'], fingers: [5, 3, 1], hands: ['L', 'L', 'L'], count: 3, praise: 'That\'s A minor!' },
+      { task: 'together', q: 'Now <b>V7</b>: G♯, D, E. Three times!', notes: ['G#2', 'D3', 'E3'], fingers: [5, 2, 1], hands: ['L', 'L', 'L'], count: 3, praise: 'That\'s E7!' },
+    ],
+    song: {
+      title: 'Foghorn', by: 'Original', time: [4, 4], key: 'Am', tempo: 76, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'A4:q:1:mp C5:q:3 E5:h:5 | D5:q:4 C5:q:3 B4:h:2 | C5:q:3 B4:q:2 A4:q:1 B4:q:2 | B4:w:2 | A4:q:1:< C5:q:3 E5:q:5 D5:q:4 | C5:q:3 B4:q:2 G#4:h:1:mf,/ | A4:q:1:> B4:q:2 C5:q:3 B4:q:2 | A4:w:1:p,/' },
+        { hand: 'L', notes: 'A2+C3+E3:w:5+3+1 | G#2+D3+E3:w:5+2+1 | A2+C3+E3:w:5+3+1 | G#2+D3+E3:w:5+2+1 | A2+C3+E3:w:5+3+1 | G#2+D3+E3:w:5+2+1 | A2+C3+E3:w:5+3+1 | A2+C3+E3:w:5+3+1' },
+      ],
+    },
+    done: 'The fog rolls back and the harbor opens up. Little <b>rowing boats</b> are bobbing by the docks: one-two-three, four-five-six…',
+  },
+  {
+    id: 'r4-4', title: 'The Rowing Boats', concept: '6/8 time',
+    landmark: { type: 'rowboats', x: 3300 }, reward: 'bridge', meter: 'Each true performance rows a boat across the harbor.',
+    clue: 'The boats rock in <b>two big swings</b>, and each swing has <b>three</b> little parts. Find them bobbing at the dock.',
+    clueShort: 'Find the rowing boats at the dock.',
+    early: 'Three little rowing boats, tied up and still.',
+    teach: [
+      { say: 'In <b>6/8</b> time there are <b>six eighth notes</b> in every measure. But we feel them in <b>two big beats</b>, each one a dotted quarter: <b>ONE</b>-two-three <b>FOUR</b>-five-six.', show: { type: 'timesig', top: 6, bottom: 8, lines: ['<b>6</b> eighth notes in every measure', 'felt as <b>2</b> big beats: ♩. ♩.'] } },
+      { say: 'In 6/8, an eighth note ♪ is one count, a quarter ♩ is two, and a dotted quarter ♩. is three: one whole big beat.', show: { type: 'score', play: true, song: { time: [6, 8], tempo: 60, notation: 'staff', voices: [{ hand: 'R', notes: 'C4:q. C4:q. | C4:q D4:e E4:q. | E4:e E4:e E4:e E4:e E4:e E4:e | C4:h.' }] } } },
+      { task: 'quiz', q: 'In 6/8, how many <b>big beats</b> do you feel in each measure?', options: ['2', '3', '6'], answer: 0 },
+      { task: 'rhythm', q: 'Row along! Tap the 6/8 rhythm. The clicks are the two big beats.', rhythm: 'q. q. | q e q. | q e q e | h.', time: [6, 8], tempo: 52 },
+      { say: 'Here\'s a round everyone knows: <b>Row, Row, Row Your Boat</b>. On "merrily, merrily", the notes come in quick groups of three.' },
+    ],
+    song: {
+      title: 'Row, Row, Row Your Boat', by: 'Traditional', time: [6, 8], tempo: 56, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'C4:q.:1 C4:q.:1 | C4:q:1 D4:e:2 E4:q.:3 | E4:q:3 D4:e:2 E4:q:3 F4:e:4 | G4:h.:5 | C5:e:5 C5:e:5 C5:e:5 G4:e:2 G4:e:2 G4:e:2 | E4:e:3 E4:e:3 E4:e:3 C4:e:1 C4:e:1 C4:e:1 | G4:q:5 F4:e:4 E4:q:3 D4:e:2 | C4:h.:1' },
+        { hand: 'L', notes: 'C3:h.:5 | C3:h. | C3:h. | C3:h. | C3:h. | C3:h. | G3:h.:1 | C3:h.:5' },
+      ],
+    },
+    done: 'Merrily, merrily! The boats glide across the harbor to a red <b>bell buoy</b>, rocking and ringing in threes.',
+  },
+  {
+    id: 'r4-5', title: 'The Bell Buoy', concept: 'Triplets',
+    landmark: { type: 'buoy', x: 4100 }, reward: 'lanterns', meter: 'Each true performance rings the buoy\'s bell.',
+    clue: 'A <b>bell buoy</b> rocks on the waves: ding-a-ling, ding-a-ling. Three rings squeezed into one beat!',
+    clueShort: 'Find the bell buoy rocking on the waves.',
+    early: 'A red buoy with a rusty bell that doesn\'t ring.',
+    teach: [
+      { say: 'A <b>triplet</b> squeezes <b>three</b> eighth notes into <b>one</b> beat, the space where two usually go. A little <b>3</b> over the beam marks them. Say "<b>tri-po-let</b>".', show: { type: 'values', values: ['ee', 'trip'] } },
+      { say: 'Listen: two even eighths, then a triplet. Feel how the triplet rolls, like a wave.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 72, notation: 'staff', voices: [{ hand: 'R', notes: 'C4:e D4:e E4:q C4:t D4:t E4:t F4:q | G4:w' }] } } },
+      { task: 'quiz', q: 'How many notes are in a <b>triplet</b>, and how long does it last?', options: ['2 notes in 1 beat', '3 notes in 1 beat', '3 notes in 3 beats'], answer: 1 },
+      { task: 'rhythm', q: 'Tap it: "ta, tri-po-let, ta, ta", then two triplets.', rhythm: 'q t t t q q | t t t t t t h', time: [4, 4], tempo: 66 },
+    ],
+    song: {
+      title: 'Bell Buoy', by: 'Original', time: [4, 4], tempo: 72, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'C4:q:1 E4:t:3 F4:t:4 G4:t:5 E4:h:3 | D4:q:2 F4:t:4 E4:t:3 D4:t:2 C4:h:1 | E4:t:3 F4:t:4 G4:t:5 E4:t:3 F4:t:4 G4:t:5 E4:q:3 C4:q:1 | D4:w:2 | C4:q:1 E4:t:3 F4:t:4 G4:t:5 E4:h:3 | F4:t:4 E4:t:3 D4:t:2 E4:t:3 D4:t:2 C4:t:1 D4:h:2 | E4:q:3 G4:q:5 D4:q:2 G4:q:5 | C4:w:1' },
+        { hand: 'L', notes: 'C3:w:5 | G3:w:1 | C3:w:5 | G3:w:1 | C3:w:5 | G3:w:1 | C3:h:5 G3:h:1 | C3:w:5' },
+      ],
+    },
+    done: 'Ding-a-ling! The buoy rings out over the waves. Beneath it, under the water, an old stone <b>arch</b> is turning in the tide.',
+  },
+  {
+    id: 'r4-6', title: 'The Sunken Arch', concept: 'Chord inversions',
+    landmark: { type: 'arch', x: 4900 }, reward: 'door', meter: 'Each true performance raises the arch from the water.',
+    clue: 'A stone arch lies half under the sea. It has been <b>turned upside down</b>, but it\'s still the same arch. Find it!',
+    clueShort: 'Find the arch half under the sea.',
+    early: 'The top of a stone arch pokes out of the water, green with seaweed.',
+    teach: [
+      { say: 'You can <b>rearrange</b> a chord\'s notes and it\'s still the same chord. C E G is <b>root position</b>: C, the root, is at the bottom.', show: { type: 'keys', keys: ['C4', 'E4', 'G4'], fingers: [1, 3, 5] } },
+      { say: 'Move C to the top: <b>E G C</b>. That\'s <b>first inversion</b>. Move E up too: <b>G C E</b>. That\'s <b>second inversion</b>. Same three letters, three different shapes.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 72, notation: 'staff', voices: [{ hand: 'R', notes: 'C4+E4+G4:h E4+G4+C5:h | G4+C5+E5:w' }] } } },
+      { task: 'together', q: 'Play <b>first inversion</b>: E, G and C together (fingers 1 2 5). Three times!', notes: ['E4', 'G4', 'C5'], fingers: [1, 2, 5], hands: ['R', 'R', 'R'], count: 3, praise: 'First inversion!' },
+      { task: 'together', q: 'Now <b>second inversion</b>: G, C and E (fingers 1 3 5). Three times!', notes: ['G4', 'C5', 'E5'], fingers: [1, 3, 5], hands: ['R', 'R', 'R'], count: 3, praise: 'Second inversion!' },
+      { say: 'Here\'s a secret: the <b>IV</b> and <b>V7</b> chords you\'ve played in your left hand were <b>inversions</b> all along! That\'s why your fingers barely had to move.' },
+      { task: 'quiz', q: 'G C E is which chord?', options: ['G major', 'C major, second inversion', 'E minor'], answer: 1 },
+    ],
+    song: {
+      title: 'Turning Tide', by: 'Original', time: [4, 4], tempo: 72, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'C4+E4+G4:h:1+3+5 E4+G4+C5:h:1+2+5 | G4+C5+E5:w:1+3+5 | E4+G4+C5:h:1+2+5 C4+E4+G4:h:1+3+5 | B3+D4+G4:w:1+2+5 | C4+F4+A4:h:1+3+5 C4+E4+G4:h:1+3+5 | C4+F4+A4:w:1+3+5 | B3+F4+G4:h:1+4+5 B3+D4+G4:h:1+2+5 | C4+E4+G4:w:1+3+5' },
+        { hand: 'L', notes: 'C3:w:5 | C3:w | C3:w | G2:w | F2:w | F2:w | G2:w | C3:w' },
+      ],
+    },
+    done: 'The arch rises from the water, dripping and shining! Through it you can see an old <b>chapel</b>, its bell tower just above the waves.',
+  },
+  {
+    id: 'r4-7', title: 'The Drowned Chapel', concept: 'Harbor finale: key signature, pickup, I–IV–V7 in G',
+    landmark: { type: 'chapel', x: 5700 }, reward: 'crystal', meter: 'Each true performance raises the chapel from the sea.',
+    clue: 'Long ago the sea swallowed the harbor chapel. Only its <b>bell tower</b> still shows. One of the most loved songs in the world might bring it back.',
+    clueShort: 'Find the chapel\'s bell tower above the waves.',
+    early: 'The top of a bell tower sticks out of the water. The bell is silent.',
+    teach: [
+      { say: '<b>Amazing Grace</b>: the words were written in 1779, and this tune, called "New Britain", was first printed in the 1830s. It\'s in <b>G major</b> (look for the key signature) and <b>3/4</b> time, and it starts with a <b>pickup</b>.' },
+      { say: 'Your left hand plays the three primary chords of G, using inversions so your hand hardly moves: <b>I</b> (G B D), <b>IV</b> (G C E) and <b>V7</b> (F♯ C D).', show: { type: 'score', play: true, song: { time: [3, 4], key: 'G', tempo: 80, notation: 'staff', voices: [{ hand: 'L', notes: 'G2+B2+D3:h.:5+3+1 | G2+C3+E3:h.:5+2+1 | F#2+C3+D3:h.:5+2+1 | G2+B2+D3:h.:5+3+1' }] } } },
+      { task: 'together', q: 'Play <b>IV</b> in G: G, C and E together. Three times!', notes: ['G2', 'C3', 'E3'], fingers: [5, 2, 1], hands: ['L', 'L', 'L'], count: 3, praise: 'That\'s the IV chord in G!' },
+      { say: 'In bar 7 the long high D is <b>tied</b> into the next bar. Hold it for five beats while the harbor listens. Then sing it out!' },
+    ],
+    song: {
+      title: 'Amazing Grace', by: 'Traditional ("New Britain", 1830s)', time: [3, 4], key: 'G', pickup: 1, tempo: 80, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'D4:q:1 | G4:h:2 B4:e:4 G4:e:2 | B4:h:4 A4:q:3 | G4:h:2 E4:q:1 | D4:h:1 D4:q:1 | G4:h:2 B4:e:4 G4:e:2 | B4:h:4 A4:e:3 B4:e:4 | D5:h.:5:~ | D5:h B4:q:4 | D5:h:5 B4:e:4 G4:e:2 | B4:h:4 A4:q:3 | G4:h:2 E4:q:1 | D4:h:1 D4:q:1 | G4:h:2 B4:e:4 G4:e:2 | B4:h:4 A4:q:3 | G4:h.:2:~ | G4:h' },
+        { hand: 'L', notes: 'r:q | G2+B2+D3:h.:5+3+1 | G2+B2+D3:h. | G2+C3+E3:h.:5+2+1 | G2+B2+D3:h.:5+3+1 | G2+B2+D3:h. | G2+B2+D3:h. | F#2+C3+D3:h.:5+2+1 | F#2+C3+D3:h. | G2+B2+D3:h.:5+3+1 | G2+B2+D3:h. | G2+C3+E3:h.:5+2+1 | G2+B2+D3:h.:5+3+1 | G2+B2+D3:h. | F#2+C3+D3:h.:5+2+1 | G2+B2+D3:h.:5+3+1 | G2+B2+D3:h' },
+      ],
+    },
+    done: 'The chapel rises out of the sea and its bell rings over the whole harbor! Every light is shining. Far above, in the mountains, something <b>glows like fire</b>… The path beyond is still forming.',
   },
 ];
 
@@ -680,9 +841,17 @@ const CURRICULUM = {
       planned: ['More songs: She\'ll Be Coming \'Round the Mountain, Oh! Susanna'],
     },
     {
-      id: 'harbor', name: 'Sunken Harbor', level: 'Level 3', lessons: [],
-      planned: ['A minor and D minor', 'Triplets', 'Major & minor triads', 'Chord inversions', 'Key signatures', '6/8 time'],
-      plannedSongs: ['Amazing Grace', 'Scarborough Fair', 'Simple Gifts', 'Greensleeves', 'Home on the Range'],
+      id: 'harbor', name: 'Sunken Harbor', level: 'Level 3', decor: 'harbor', length: 6400, start: 250,
+      palette: {
+        silent: { skyTop: '#6f7a8c', skyBot: '#c3c6cc', far: '#8a8f9c', mid: '#7a8796', near: '#6e7468', ground: '#62675d', fog: '#c3c6cc' },
+        awake: { skyTop: '#ff7a59', skyBot: '#ffd29a', far: '#8d5fd3', mid: '#1f8fd6', near: '#c98b4e', ground: '#a8703c', fog: '#ffe8cc' },
+      },
+      intro: [
+        'The <b>Sunken Harbor</b>. Long ago the sea rose and swallowed half the town. The lighthouse went dark, and the fog never lifted.',
+        'The songs here are deeper: <b>minor keys</b>, rolling <b>6/8</b> rhythms, and chords turned <b>upside down</b>. Let\'s bring the harbor back up!',
+      ],
+      lessons: REALM_4,
+      planned: ['D minor', 'More songs: Scarborough Fair, Simple Gifts, Greensleeves, Home on the Range'],
     },
     {
       id: 'peaks', name: 'Ember Peaks', level: 'Level 4', lessons: [],
