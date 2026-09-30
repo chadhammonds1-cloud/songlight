@@ -424,3 +424,4 @@ b { font-weight: 800; }
 }
 .score-svg .pedal { fill: none; stroke: var(--ink-2); stroke-width: 1.6; stroke-linejoin: round; }
 .score-svg .tuplet { fill: var(--ink-2); font: italic 800 1em Georgia, 'Times New Roman', serif; }
+.score-svg .trill { fill: var(--ink); font: italic 800 1em Georgia, 'Times New Roman', serif; }

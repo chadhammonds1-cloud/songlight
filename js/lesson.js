@@ -422,6 +422,45 @@ const LessonUI = (() => {
       later(play, 300);
     },
 
+    // Name the key from its signature. items: [{ key: 'D', answer: 'D' }], choices: [[value, label]]
+    keysig(st, w, done) {
+      let k = 0;
+      const order = st.items.map((_, i) => i).sort(() => Math.random() - 0.5);
+      const el = add(w, `<div class="read"><div class="score mini read-score"></div>
+        <div class="choices">${st.choices.map(([v, label]) => `<button class="choice" data-v="${v}">${label}</button>`).join('')}</div>
+        <div class="pips big">${pips(st.items.length, 0)}</div></div>`);
+      const host = $('.read-score', el), fb = feedback(w);
+      const show = () => Notation.render(host, Music.compile({ time: [4, 4], key: st.items[order[k]].key, notation: 'staff', voices: [{ hand: 'R', notes: 'r:w' }] }), { hideTime: true, maxPerLine: 1, width: 260, sp: 11 });
+      el.querySelectorAll('.choice').forEach(btn => btn.onclick = () => {
+        if (k >= st.items.length) return;
+        if (btn.dataset.v === st.items[order[k]].answer) {
+          k++; $('.pips', el).innerHTML = pips(st.items.length, k);
+          if (k >= st.items.length) { fb('You can read key signatures!'); done(); } else { fb(praise()); show(); }
+        } else { fb(st.hint || 'Count the sharps or flats.'); Sound.chime('no'); }
+      });
+      show();
+    },
+
+    // Alternate two neighbouring keys quickly and evenly: count alternations in a row.
+    trill(st, w, done) {
+      const [a, b] = st.notes.map(Music.midi);
+      let run = 0, last = null, lastT = 0, finished = false;
+      piano.hint([{ midi: a, finger: st.fingers?.[0], hand: 'R' }, { midi: b, finger: st.fingers?.[1], hand: 'R' }]);
+      const el = add(w, `<div class="pips big">${pips(st.count, 0)}</div>`);
+      const fb = feedback(w);
+      listen('down', m => {
+        if (finished) return;
+        const now = performance.now();
+        if (m !== a && m !== b) { piano.flash(m, 'bad'); return; }
+        if (m === last || now - lastT > 320) run = 0; // must alternate, and keep it quick
+        if (run === 0 && m !== a) { last = m; lastT = now; fb('Start on the <b>main</b> note, then alternate.'); return; }
+        run++; last = m; lastT = now; piano.flash(m, 'good');
+        el.innerHTML = pips(st.count, Math.min(run, st.count));
+        if (run >= st.count) { finished = true; piano.clearHints(); fb('A real trill! ' + praise()); done(); }
+        else if (run > 2) fb('Keep going, quick and even…');
+      });
+    },
+
     dyn(st, w, done) {
       let step = 0;
       const el = add(w, `<div class="dyn-row"><span class="dchip" data-d="f"><i>f</i> loud</span><span class="dchip" data-d="p"><i>p</i> soft</span></div><div class="vel"><span></span></div>`);
@@ -501,7 +540,7 @@ const LessonUI = (() => {
           <div class="song-meta">
             <p class="kicker">${song.by === 'Original' ? 'Original song' : song.by === 'Traditional' ? 'Traditional song' : 'Public domain · ' + song.by}</p>
             <h3>${song.title}</h3>
-            <p class="meta">${song.time[0]}/${song.time[1]} time · ${song.pulse === 1.5 ? '♩.' : '♩'} = ${song.tempo}${song.repeat ? ' · play twice' : ''}</p>
+            <p class="meta">${song.time[0]}/${song.time[1]} time · ${song.pulse === 1.5 ? '♩.' : song.pulse === 0.5 ? '♪' : '♩'} = ${song.tempo}${song.repeat ? ' · play twice' : ''}</p>
           </div>
           <div class="reward-box">
             <canvas class="reward" aria-hidden="true"></canvas>

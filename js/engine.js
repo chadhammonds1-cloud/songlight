@@ -9,6 +9,12 @@ class Performer {
   // A tied note lights up every notehead it spans.
   mark(n, cls) { this.score?.mark(n.glyph, cls); n.tied?.forEach(gl => this.score?.mark(gl, cls)); }
   static sounding(n) { return n.ring || n.dur * (n.stacc ? 0.4 : 0.92); }
+  // Schedule one note; a trill alternates quickly with the note above.
+  static schedule(n, t0, spb, vel) {
+    if (!n.trill) { Sound.play(n.midi, t0 + n.beat * spb, Performer.sounding(n) * spb, vel); return; }
+    const start = t0 + n.beat * spb, end = start + n.dur * spb * 0.92, step = Math.max(0.07, spb / 8);
+    for (let t = start, k = 0; t < end - 0.02; t += step, k++) Sound.play(k % 2 ? n.trill : n.midi, t, step * 1.1, vel * (k ? 0.85 : 1));
+  }
 
   stop() {
     this.active = false;
@@ -29,7 +35,7 @@ class Performer {
     this.score?.clear();
     const spb = this.song.spq / tempoScale;
     const t0 = ctx.currentTime + 0.3, p0 = performance.now() + 300;
-    this.song.notes.forEach(n => Sound.play(n.midi, t0 + n.beat * spb, Performer.sounding(n) * spb, n.vel ?? 0.6));
+    this.song.notes.forEach(n => Performer.schedule(n, t0, spb, n.vel ?? 0.6));
     const loop = () => {
       if (!this.active) return;
       const b = (performance.now() - p0) / 1000 / spb;
@@ -98,7 +104,7 @@ class Performer {
     }
     const req = [], auto = [];
     song.notes.forEach(n => (hands === 'both' || n.hand === hands ? req : auto).push(n));
-    auto.forEach(n => Sound.play(n.midi, tA + n.beat * spb, Performer.sounding(n) * spb, (n.vel ?? 0.6) * 0.7));
+    auto.forEach(n => Performer.schedule(n, tA, spb, (n.vel ?? 0.6) * 0.7));
     // Close notes (eighths) get a narrower window so one press can't claim its neighbour.
     let gap = 1;
     for (let i = 1; i < req.length; i++) { const d = req[i].beat - req[i - 1].beat; if (d > 1e-6 && d < gap) gap = d; }
@@ -122,6 +128,8 @@ class Performer {
         if (bd < 0.1) perfect++;
         this.piano?.flash(m, 'good');
         this.mark(req[best], 'hit');
+      } else if (req.some(n => n.trill && (m === n.midi || m === n.trill) && t >= n.beat * spb - win && t <= (n.beat + n.dur) * spb)) {
+        this.piano?.flash(m, 'good'); // the alternating notes of a trill are never mistakes
       } else {
         wrong++;
         this.piano?.flash(m, 'bad');

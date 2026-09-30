@@ -140,6 +140,7 @@ const Game = (() => {
   function realmDoneLine() {
     const nr = CURRICULUM.realms[realmIdx + 1];
     if (nr && realmOpen(realmIdx + 1)) return `The whole ${realm.name} is awake! Open the <b>map</b> to travel to ${nr.name}.`;
+    if (!nr && CURRICULUM.realms.every(realmComplete)) return `Every realm is awake. The <b>Great Song</b> is whole again, and you brought it back, one song at a time. Every place you woke will play its song for you whenever you visit.`;
     return `The whole ${realm.name} is awake! The path beyond is still forming… more songs are on their way. You can visit any place here to play its song again.`;
   }
 

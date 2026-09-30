@@ -147,7 +147,7 @@ const Notation = (() => {
       const evs = v.events;
       // Beam short notes that share a beat (a dotted-quarter pulse in 6/8), triplets in threes.
       const beams = [];
-      const unit = song.pulse || 1;
+      const unit = song.beamUnit || 1;
       for (let i = 0; i < evs.length; i++) {
         const a = evs[i];
         if (a.rest || a.dur >= 1) continue;
@@ -231,6 +231,10 @@ const Notation = (() => {
             else fy = Math.min(yTop - (up ? reach : ry), staff ? s.tt : 1e9) - sp * (0.8 + i * 1.5);
             T(f, { x, y: fy, class: 'finger', fill: FINGER_COLORS[f] || '#6c6892', 'font-size': sp * 1.45, 'text-anchor': 'middle' }, g);
           });
+        }
+        if (e.trill) {
+          const above = Math.min(yTop - (up && e.dur < 4 ? stemLen : ry), staff ? s.tt : 1e9) - sp * (0.9 + (hand === 'L' ? 0 : e.fingers.length) * 1.5);
+          T('tr', { x: x + sp * 0.2, y: above, class: 'trill', 'font-size': sp * 1.7, 'text-anchor': 'middle' }, g);
         }
         if (e.dyn) {
           const dy = staff ? s.tt + sp * 7.6 : s.mid + sp * 0.6;

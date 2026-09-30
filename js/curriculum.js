@@ -957,7 +957,165 @@ const REALM_5 = [
         { hand: 'L', notes: 'G2+B2+D3:h.:5+3+1 | G2+B2+D3:h. | G2+C3+E3:h.:5+2+1 | G2+B2+D3:h.:5+3+1 | A2+C3+E3:h.:5+3+1 | G2+B2+D3:h.:5+3+1 | F#2+C3+D3:h.:5+2+1 | F#2+C3+D3:h. | G2+B2+D3:h.:5+3+1 | G2+B2+D3:h. | G2+C3+E3:h.:5+2+1 | G2+B2+D3:h.:5+3+1 | A2+C3+E3:h.:5+3+1 | G2+B2+D3:h.:5+3+1 | F#2+C3+D3:h.:5+2+1 | G2+B2+D3:h.:5+3+1' },
       ],
     },
-    done: 'Lights whirl around the pavilion in a perfect minuet, and the whole mountain range glows like sunrise! High above, among the stars, a <b>citadel</b> is shimmering into view… The path beyond is still forming.',
+    done: 'Lights whirl around the pavilion in a perfect minuet, and the whole mountain range glows like sunrise! High above, among the stars, a <b>citadel</b> is shimmering into view… Open the map: the way to <b>Starfall Citadel</b> is open.',
+  },
+];
+
+const REALM_6 = [
+  {
+    id: 'r6-1', title: 'The Star Compass', concept: 'The circle of fifths · Key of D · Ground bass',
+    landmark: { type: 'starcompass', x: 900 }, reward: 'stars', meter: 'Each true performance lights a point of the compass.',
+    clue: 'At the citadel gate lies a great <b>compass</b> of twelve stars. Every key in music has its place on it.',
+    clueShort: 'Find the compass of twelve stars.',
+    early: 'A round stone compass with twelve dark stars around its rim.',
+    teach: [
+      { say: 'Start at C and count up a <b>5th</b>: G. Up another 5th: D, then A, E, B… Each step adds <b>one more sharp</b>. Going the other way, down in 5ths, F, B♭, E♭… each adds <b>one more flat</b>. Twelve keys in a circle: the <b>circle of fifths</b>.' },
+      { say: 'Sharps always appear in the same order: <b>F C G D A E B</b>. Flats are the same letters backwards: <b>B E A D G C F</b>. A trick: the last sharp is one half step <b>below</b> the key\'s name. With flats, the next-to-last flat <b>is</b> the key\'s name.', show: { type: 'score', song: { time: [4, 4], key: 'D', notation: 'staff', voices: [{ hand: 'R', notes: 'D4:q E4:q F#4:q G4:q | A4:q B4:q C#5:q D5:q' }] } } },
+      { task: 'keysig', q: 'Name each major key from its key signature.', choices: [['G', 'G'], ['D', 'D'], ['A', 'A'], ['F', 'F'], ['Bb', 'B♭'], ['Eb', 'E♭']], hint: 'Sharps: the last sharp is a half step below the key. Flats: the next-to-last flat names the key (and one flat is F).', items: [{ key: 'G', answer: 'G' }, { key: 'D', answer: 'D' }, { key: 'A', answer: 'A' }, { key: 'F', answer: 'F' }, { key: 'Bb', answer: 'Bb' }, { key: 'Eb', answer: 'Eb' }] },
+      { task: 'tap', order: true, hint: true, q: 'Play the <b>D major</b> scale: two sharps, F♯ and C♯. Thumb under after F♯!', targets: ['D4', 'E4', 'F#4', 'G4', 'A4', 'B4', 'C#5', 'D5'], fingers: [1, 2, 3, 1, 2, 3, 4, 5] },
+      { say: 'Around 1680, <b>Johann Pachelbel</b> wrote a Canon in D over a <b>ground bass</b>: a bass line of eight notes that repeats again and again while the melody floats above it. Your left hand plays that bass; your right hand plays the violin\'s famous opening lines.' },
+    ],
+    song: {
+      title: 'Canon in D (opening)', by: 'Johann Pachelbel (c. 1680)', time: [4, 4], key: 'D', tempo: 60, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'F#5:h:4:p E5:h:3 | D5:h:2 C#5:h:1 | B4:h:3 A4:h:2 | B4:h:3 C#5:h:4 | D5:h:5:< C#5:h:4 | B4:h:3 A4:h:2 | G4:h:1 F#4:h:3 | G4:h:4 E4:h:2:mf,/ | F#4+A4+D5:w:1+2+5' },
+        { hand: 'L', notes: 'D3:h:1 A2:h:4 | B2:h:3 F#2:h:5 | G2:h:4 D2:h:5 | G2:h:4 A2:h:3 | D3:h:1 A2:h:4 | B2:h:3 F#2:h:5 | G2:h:4 D2:h:5 | G2:h:4 A2:h:3 | D2+D3:w:5+1' },
+      ],
+    },
+    done: 'All twelve stars of the compass blaze, and the citadel gate swings open. Inside, a deep <b>well</b> holds the reflection of the moon.',
+  },
+  {
+    id: 'r6-2', title: 'The Moon Well', concept: 'D minor · Harmonic minor · i, iv, V7',
+    landmark: { type: 'moonwell', x: 1700 }, reward: 'flower', meter: 'Each true performance fills the well with moonlight.',
+    clue: 'Every major key has a minor twin. F major\'s twin is waiting at the bottom of the <b>moon well</b>.',
+    clueShort: 'Find the well that holds the moon.',
+    early: 'An old stone well. Far below, the water is black.',
+    teach: [
+      { say: '<b>D minor</b> is the relative minor of <b>F major</b>, so it shares F\'s key signature: <b>one flat, B♭</b>. Its home note is D.', show: { type: 'score', play: true, song: { time: [4, 4], key: 'Dm', tempo: 100, notation: 'staff', voices: [{ hand: 'R', notes: 'D4:q E4:q F4:q G4:q | A4:q Bb4:q C5:q D5:q' }] } } },
+      { say: 'In <b>harmonic minor</b> the 7th note is raised, so C becomes <b>C♯</b>. It pulls strongly back up to D.', show: { type: 'score', play: true, song: { time: [4, 4], key: 'Dm', tempo: 100, notation: 'staff', voices: [{ hand: 'R', notes: 'D4:q E4:q F4:q G4:q | A4:q Bb4:q C#5:q D5:q' }] } } },
+      { task: 'quiz', q: 'D minor shares its key signature with…', options: ['C major', 'F major', 'D major'], answer: 1 },
+      { say: 'The chords of D minor, all in easy left-hand shapes: <b>i</b> (D F A), <b>iv</b> (D G B♭) and <b>V7</b> (C♯ G A).', show: { type: 'score', play: true, song: { time: [4, 4], key: 'Dm', tempo: 72, notation: 'staff', voices: [{ hand: 'L', notes: 'D3+F3+A3:h:5+3+1 D3+G3+Bb3:h:5+2+1 | C#3+G3+A3:h:5+2+1 D3+F3+A3:h:5+3+1' }] } } },
+      { task: 'together', q: 'Play <b>V7</b> in D minor: C♯, G and A. Three times!', notes: ['C#3', 'G3', 'A3'], fingers: [5, 2, 1], hands: ['L', 'L', 'L'], count: 3, praise: 'That\'s A7!' },
+    ],
+    song: {
+      title: 'Moon Well', by: 'Original', time: [4, 4], key: 'Dm', tempo: 72, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'D4:q:1:mp F4:q:3 A4:h:5 | G4:q:4 F4:q:3 E4:h:2 | F4:q:3 E4:q:2 D4:q:1 E4:q:2 | E4:h:2 C#4:h:1 | D4:q:1:< F4:q:3 A4:q:5 G4:q:4 | G4:q:4 F4:q:3 E4:q:2 D4:q:1:mf,/ | E4:q:2:> F4:q:3 E4:q:2 C#4:q:1 | D4:w:1:p,/' },
+        { hand: 'L', notes: 'D3+F3+A3:w:5+3+1 | D3+G3+Bb3:w:5+2+1 | D3+F3+A3:w:5+3+1 | C#3+G3+A3:w:5+2+1 | D3+F3+A3:w:5+3+1 | D3+G3+Bb3:w:5+2+1 | C#3+G3+A3:w:5+2+1 | D3+F3+A3:w:5+3+1' },
+      ],
+    },
+    done: 'Moonlight rises up the well and spills out across the courtyard. It lights the way to a tower where the moon and sun are <b>eclipsing</b>.',
+  },
+  {
+    id: 'r6-3', title: 'The Eclipse Tower', concept: 'Diminished & augmented triads',
+    landmark: { type: 'eclipsetower', x: 2500 }, reward: 'crystal', meter: 'Each true performance pulls the eclipse apart a little more.',
+    clue: 'In the <b>Eclipse Tower</b>, chords get strange: some squeezed <b>smaller</b>, some stretched <b>bigger</b>. Find the tower!',
+    clueShort: 'Find the tower of the eclipse.',
+    early: 'A tall tower. Above it, a black disc covers the sun.',
+    teach: [
+      { say: 'You know <b>major</b> triads (a big 3rd, then a small 3rd) and <b>minor</b> ones (small, then big). Stack <b>two small 3rds</b> and you get a <b>diminished</b> triad: C E♭ G♭. It sounds tense and shadowy.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 60, notation: 'staff', voices: [{ hand: 'R', notes: 'C4+E4+G4:h C4+Eb4+Gb4:h' }] } } },
+      { say: 'Stack <b>two big 3rds</b> and you get an <b>augmented</b> triad: C E G♯. It sounds dreamy, like it\'s floating up.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 60, notation: 'staff', voices: [{ hand: 'R', notes: 'C4+E4+G4:h C4+E4+G#4:h' }] } } },
+      { task: 'quiz', q: 'A <b>diminished</b> triad is built from…', options: ['Two big (major) 3rds', 'Two small (minor) 3rds', 'A big 3rd, then a small 3rd'], answer: 1 },
+      { task: 'together', q: 'Play <b>C diminished</b>: C, E♭ and G♭ together. Three times!', notes: ['C4', 'Eb4', 'Gb4'], fingers: [1, 3, 5], hands: ['R', 'R', 'R'], count: 3, praise: 'Spooky! That\'s diminished.' },
+      { task: 'ear', q: 'Listen to each chord. Which kind of triad is it?', choices: [['major', 'Major'], ['minor', 'Minor'], ['diminished', 'Diminished'], ['augmented', 'Augmented']], hint: 'Bright, dark, tense, or floating?', praise: 'Four kinds of triad, all by ear!', items: [
+        { notes: ['C4', 'E4', 'G4'], answer: 'major' }, { notes: ['C4', 'Eb4', 'G4'], answer: 'minor' }, { notes: ['C4', 'Eb4', 'Gb4'], answer: 'diminished' }, { notes: ['C4', 'E4', 'G#4'], answer: 'augmented' },
+        { notes: ['D4', 'F4', 'Ab4'], answer: 'diminished' }, { notes: ['F4', 'A4', 'C#5'], answer: 'augmented' }, { notes: ['A3', 'C4', 'E4'], answer: 'minor' }, { notes: ['G3', 'B3', 'D4'], answer: 'major' },
+      ] },
+    ],
+    song: {
+      title: 'Eclipse', by: 'Original', time: [4, 4], tempo: 66, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'C4+E4+G4:h:1+3+5 C4+E4+G#4:h:1+3+5 | C4+E4+A4:w:1+2+5 | D4+F4+A4:h:1+3+5 D4+F4+B4:h:1+2+5 | C4+E4+G4:w:1+3+5 | C4+E4+G4:h:1+3+5 C#4+E4+G4:h:1+3+5 | D4+F4+A4:w:1+3+5 | B3+D4+F4+G4:h:1+2+4+5 B3+D#4+G4:h:1+3+5 | C4+E4+G4:w:1+3+5' },
+        { hand: 'L', notes: 'C3:w:1 | A2:w:3 | D3:h:1 B2:h:2 | C3:w:1 | C3:h:2 C#3:h:1 | D3:w:1 | G2:w:5 | C3:w:1' },
+      ],
+    },
+    done: 'The eclipse breaks and sunlight and moonlight pour out together! Up on a slender spire, a <b>nightingale</b> starts to sing, its notes fluttering.',
+  },
+  {
+    id: 'r6-4', title: 'The Nightingale Spire', concept: 'Ornaments: the trill',
+    landmark: { type: 'nightingale', x: 3300 }, reward: 'lanterns', meter: 'Each true performance teaches the nightingale a new song.',
+    clue: 'High on a spire, a <b>nightingale</b> is trying to sing, but its song has lost its <b>flutter</b>. Find the spire!',
+    clueShort: 'Find the spire where the nightingale lives.',
+    early: 'A thin, tall spire. A little grey bird sits at the top, silent.',
+    teach: [
+      { say: 'An <b>ornament</b> decorates a note. The most famous is the <b>trill</b>, marked <b><i>tr</i></b>: quickly alternate the written note with the note just <b>above</b> it in the key, like a bird singing.', show: { type: 'score', play: true, song: { time: [3, 4], key: 'G', tempo: 88, notation: 'staff', voices: [{ hand: 'R', notes: 'B4:q:3 A4:h:2:tr | G4:h.:1' }] } } },
+      { task: 'trill', q: 'Trill on A: start on <b>A</b> (finger 2), then flutter A–B–A–B with fingers <b>2</b> and <b>3</b>, quick and even.', notes: ['A4', 'B4'], fingers: [2, 3], count: 10 },
+      { task: 'quiz', q: 'In the key of G, a trill on <b>E</b> alternates with…', options: ['D', 'F♯', 'F'], answer: 1 },
+      { say: 'In the song, trills come at the ends of phrases, where Baroque composers loved them. The game only needs the main note on time; the flutter is your decoration, and extra trill notes never count as mistakes.' },
+    ],
+    song: {
+      title: 'Nightingale', by: 'Original', time: [3, 4], key: 'G', tempo: 96, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'B4:q:3 D5:q:5 B4:q:3 | A4:h:2:tr G4:q:1 | A4:q:2 C5:q:4 A4:q:2 | B4:h.:3 | D5:q:5 C5:q:4 B4:q:3 | C5:q:4 B4:q:3 A4:q:2 | B4:q:3 A4:h:2:tr | G4:h.:1' },
+        { hand: 'L', notes: 'G2+B2+D3:h.:5+3+1 | F#2+C3+D3:h:5+2+1 G2+B2+D3:q:5+3+1 | F#2+C3+D3:h.:5+2+1 | G2+B2+D3:h.:5+3+1 | G2+B2+D3:h. | G2+C3+E3:h.:5+2+1 | F#2+C3+D3:h.:5+2+1 | G2+B2+D3:h.:5+3+1' },
+      ],
+    },
+    done: 'The nightingale sings, trills and all! Its song echoes through a great gallery full of <b>clockwork</b>, where everything moves in three parts.',
+  },
+  {
+    id: 'r6-5', title: 'The Clockwork Gallery', concept: 'Sonatina form',
+    landmark: { type: 'clockwork', x: 4100 }, reward: 'door', meter: 'Each true performance winds the great clock.',
+    clue: 'In the <b>Clockwork Gallery</b>, every piece of music is built like a clock: it sets out, wanders away, and comes back home right on time.',
+    clueShort: 'Find the great clock in the gallery.',
+    early: 'A giant clock with frozen gears. Its hands haven\'t moved in years.',
+    teach: [
+      { say: 'Longer pieces have a <b>form</b>, a plan. A <b>sonatina</b> has three parts. The <b>exposition</b> presents a first theme in the home key, then a second theme in a new key, usually the <b>dominant</b> (V).' },
+      { say: 'Next comes the <b>development</b>: the music wanders through other keys, often minor ones, and plays with the themes. Finally the <b>recapitulation</b> brings the first theme back <b>home</b>.' },
+      { task: 'quiz', q: 'In the exposition, the second theme is usually in the key of…', options: ['The IV chord', 'The dominant (V)', 'The same key'], answer: 1 },
+      { task: 'quiz', q: 'Which part brings the first theme back in the home key?', options: ['Exposition', 'Development', 'Recapitulation'], answer: 2 },
+      { say: 'This little sonatina: bars 1–4 are the first theme in <b>C</b>; bars 5–8 the second theme in <b>G</b> (with F♯); bars 9–12 the development in <b>A minor</b>; and bars 13–16 the recapitulation back in C.' },
+    ],
+    song: {
+      title: 'Sonatina in C', by: 'Original', time: [4, 4], tempo: 96, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'C4:q:1:mf E4:q:3 G4:h:5 | F4:q:4 D4:q:2 E4:q:3 C4:q:1 | D4:q:2 F4:q:4 E4:q:3 D4:q:2 | G4:w:5 | D5:q:5:mp B4:q:3 G4:h:1 | A4:q:2 B4:q:3 C5:q:4 A4:q:2 | B4:q:3 A4:q:2 F#4:q:1 A4:q:2 | G4:w:1 | A4:q:2:p C5:q:4 B4:q:3 A4:q:2 | G#4:h:1 A4:h:2 | D5:q:5:< C5:q:4 B4:q:3 A4:q:2 | B4:h:3 G4:h:1:mf,/ | C4:q:1 E4:q:3 G4:h:5 | F4:q:4 D4:q:2 E4:q:3 C4:q:1 | D4:q:2 F4:q:4 E4:q:3 D4:q:2 | C4:w:1' },
+        { hand: 'L', notes: 'C3+E3+G3:w:5+3+1 | C3+F3+A3:h:5+2+1 C3+E3+G3:h:5+3+1 | B2+F3+G3:w:5+2+1 | B2+D3+G3:w:5+3+1 | G2+B2+D3:w:5+3+1 | F#2+C3+D3:w:5+2+1 | F#2+C3+D3:w | G2+B2+D3:w:5+3+1 | A2+C3+E3:w:5+3+1 | G#2+B2+E3:h:5+3+1 A2+C3+E3:h:5+3+1 | D3+F3+A3:w:5+3+1 | B2+F3+G3:w:5+2+1 | C3+E3+G3:w:5+3+1 | C3+F3+A3:h:5+2+1 C3+E3+G3:h:5+3+1 | B2+F3+G3:w:5+2+1 | C3+E3+G3:w:5+3+1' },
+      ],
+    },
+    done: 'Tick, tock, CHIME! The great clock starts again. In the next hall stands a harp strung with every colour of light.',
+  },
+  {
+    id: 'r6-6', title: 'The Prism Harp', concept: 'A Bach prelude: broken chords & the pedal',
+    landmark: { type: 'prismharp', x: 4900 }, reward: 'stars', meter: 'Each true performance sets another colour ringing.',
+    clue: 'A harp made of light waits in the citadel. Its music is nothing but <b>chords, broken into ripples</b>: one of the most famous pieces ever written for keyboard.',
+    clueShort: 'Find the harp strung with light.',
+    early: 'A tall harp frame with no strings, only faint grey lines of light.',
+    teach: [
+      { say: 'In 1722, <b>Johann Sebastian Bach</b> wrote a book of preludes and fugues in every key. The very first, the <b>Prelude in C</b>, is just one idea: each bar is a chord, broken into a rippling pattern and played <b>twice</b>.', show: { type: 'score', play: true, song: { time: [4, 4], tempo: 66, notation: 'staff', voices: [{ hand: 'R', notes: 'C4:s:L2:P E4:s:L1 G4:s:1 C5:s:3 E5:s:5 G4:s C5:s E5:s C4:s:L2 E4:s:L1 G4:s C5:s E5:s G4:s C5:s E5:s::*' }] } } },
+      { say: 'Your <b>left hand</b> plays the first two notes of each group; your <b>right hand</b> plays the three higher notes, then repeats them. Change the <b>pedal</b> at every new bar so each chord rings like a harp.' },
+      { task: 'quiz', q: 'How many times is each bar\'s pattern played?', options: ['Once', 'Twice', 'Four times'], answer: 1 },
+      { say: 'The trick is to <b>see the chord</b>: before each bar, find the whole shape with both hands, then ripple through it. Slow practice in <b>With the beat</b> helps a lot here.' },
+    ],
+    song: {
+      title: 'Prelude in C (opening bars)', by: 'J. S. Bach (1722)', time: [4, 4], tempo: 66, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'C4:s:L2:P E4:s:L1 G4:s:1 C5:s:3 E5:s:5 G4:s C5:s E5:s C4:s:L E4:s:L G4:s C5:s E5:s G4:s C5:s E5:s | C4:s:L2:P D4:s:L1 A4:s:1 D5:s:3 F5:s:5 A4:s D5:s F5:s C4:s:L D4:s:L A4:s D5:s F5:s A4:s D5:s F5:s | B3:s:L2:P D4:s:L1 G4:s:1 D5:s:4 F5:s:5 G4:s D5:s F5:s B3:s:L D4:s:L G4:s D5:s F5:s G4:s D5:s F5:s | C4:s:L2:P E4:s:L1 G4:s:1 C5:s:3 E5:s:5 G4:s C5:s E5:s C4:s:L E4:s:L G4:s C5:s E5:s G4:s C5:s E5:s | C4:s:L2:P E4:s:L1 A4:s:1 E5:s:3 A5:s:5 A4:s E5:s A5:s C4:s:L E4:s:L A4:s E5:s A5:s A4:s E5:s A5:s | C4:s:L2:P D4:s:L1 F#4:s:1 A4:s:2 D5:s:5 F#4:s A4:s D5:s C4:s:L D4:s:L F#4:s A4:s D5:s F#4:s A4:s D5:s | B3:s:L2:P D4:s:L1 G4:s:1 D5:s:3 G5:s:5 G4:s D5:s G5:s B3:s:L D4:s:L G4:s D5:s G5:s G4:s D5:s G5:s | B3:s:L2:P C4:s:L1 E4:s:1 G4:s:2 C5:s:5 E4:s G4:s C5:s B3:s:L C4:s:L E4:s G4:s C5:s E4:s G4:s C5:s | A3:s:L2:P C4:s:L1 E4:s:1 G4:s:2 C5:s:5 E4:s G4:s C5:s A3:s:L C4:s:L E4:s G4:s C5:s E4:s G4:s C5:s | D3:s:L5:P A3:s:L1 D4:s:1 F#4:s:2 C5:s:5 D4:s F#4:s C5:s D3:s:L A3:s:L D4:s F#4:s C5:s D4:s F#4:s C5:s | G3:s:L2:P B3:s:L1 D4:s:1 G4:s:3 B4:s:5 D4:s G4:s B4:s G3:s:L B3:s:L D4:s G4:s B4:s D4:s G4:s B4:s | E4+G4+C5:w:1+2+5:P,*' },
+        { hand: 'L', notes: 'r:w | r:w | r:w | r:w | r:w | r:w | r:w | r:w | r:w | r:w | r:w | C3+G3:w:5+1:P,*' },
+      ],
+    },
+    done: 'Every string of the harp shines a different colour! The light gathers into a single beam pointing to the heart of the citadel: the <b>Starfall Throne</b>.',
+  },
+  {
+    id: 'r6-7', title: 'The Starfall Throne', concept: 'The grand finale: Beethoven in A minor',
+    landmark: { type: 'throne', x: 5700 }, reward: 'crystal', meter: 'Each true performance brings the Great Song closer to whole.',
+    clue: 'This is it: the <b>Starfall Throne</b>, where the Great Song began. One last piece, by one of the greatest composers who ever lived, will make it whole.',
+    clueShort: 'Find the Starfall Throne at the heart of the citadel.',
+    early: 'A throne of dark crystal under a sky with no stars. Everything here is waiting for one last song.',
+    teach: [
+      { say: 'Around 1810, <b>Ludwig van Beethoven</b> wrote a little piece in <b>A minor</b>. We call it <b>Für Elise</b>, and it may be the most famous piano melody in the world. You played Beethoven\'s <b>Ode to Joy</b> back in Whisperwood; now you\'re ready for this.' },
+      { say: 'It\'s in <b>3/8</b> time: three eighth notes per bar, and most notes are <b>sixteenths</b>. It starts with a two-note <b>pickup</b>, E and D♯, rocking back and forth. Your left hand answers with little arpeggios.', show: { type: 'score', play: true, song: { time: [3, 8], pickup: 0.5, key: 'Am', tempo: 112, notation: 'staff', voices: [{ hand: 'R', notes: 'E5:s:5 D#5:s:4 | E5:s:5 D#5:s:4 E5:s:5 B4:s:2 D5:s:4 C5:s:3 | A4:q:1' }, { hand: 'L', notes: 'r:e | r:q. | A2:s:5 E3:s:2 A3:s:1 r:s' }] } } },
+      { task: 'tap', order: true, hint: true, q: 'The opening: E D♯ E D♯ E B D C A, with fingers <b>5 4 5 4 5 2 4 3 1</b>.', targets: ['E5', 'D#5', 'E5', 'D#5', 'E5', 'B4', 'D5', 'C5', 'A4'], fingers: [5, 4, 5, 4, 5, 2, 4, 3, 1] },
+      { task: 'quiz', q: 'In <b>3/8</b> time, each bar holds…', options: ['Three quarter notes', 'Three eighth notes', 'Eight notes'], answer: 1 },
+      { say: 'The hands take turns: the left hand plays A–E–A (or E–E–G♯), then the right hand continues upward. Keep it <b>soft</b> and flowing. This is the last song. Let\'s make the Great Song whole!' },
+    ],
+    song: {
+      title: 'Für Elise (theme)', by: 'Ludwig van Beethoven (c. 1810)', time: [3, 8], pickup: 0.5, key: 'Am', tempo: 112, notation: 'staff',
+      voices: [
+        { hand: 'R', notes: 'E5:s:5:pp D#5:s:4 | E5:s:5 D#5:s:4 E5:s:5 B4:s:2 D5:s:4 C5:s:3 | A4:e:1 r:s C4:s:1 E4:s:2 A4:s:4 | B4:e:5 r:s E4:s:1 G#4:s:3 B4:s:4 | C5:e:5 r:s E4:s:1 E5:s:5 D#5:s:4 | E5:s:5 D#5:s:4 E5:s:5 B4:s:2 D5:s:4 C5:s:3 | A4:e:1 r:s C4:s:1 E4:s:2 A4:s:4 | B4:e:5 r:s E4:s:1 C5:s:4 B4:s:3 | A4:q:2' },
+        { hand: 'L', notes: 'r:e | r:q. | A2:s:5 E3:s:2 A3:s:1 r:e. | E2:s:5 E3:s:2 G#3:s:1 r:e. | A2:s:5 E3:s:2 A3:s:1 r:e. | r:q. | A2:s:5 E3:s:2 A3:s:1 r:e. | E2:s:5 E3:s:2 G#3:s:1 r:e. | A2:s:5 E3:s:2 A3:s:1 r:s' },
+      ],
+    },
+    done: 'The throne blazes with light and the stars come pouring back into the sky. Every realm, from the Hushed Meadow to the Starfall Citadel, is <b>singing at once</b>. The Great Song is whole again, and you are the one who brought it back.',
   },
 ];
 
@@ -1028,9 +1186,17 @@ const CURRICULUM = {
       planned: ['More songs: Brahms\' Lullaby, Can-Can, The Entertainer'],
     },
     {
-      id: 'citadel', name: 'Starfall Citadel', level: 'Level 5', lessons: [],
-      planned: ['All major scales', 'Relative & harmonic minors', 'Diminished & augmented triads', 'Ornaments & trills', 'Sonatina form'],
-      plannedSongs: ['Für Elise (theme)', 'Prelude in C (Bach)', 'Maple Leaf Rag', 'Canon in D', 'Gymnopédie No. 1'],
+      id: 'citadel', name: 'Starfall Citadel', level: 'Level 5', decor: 'citadel', length: 6400, start: 250,
+      palette: {
+        silent: { skyTop: '#23233a', skyBot: '#55566e', far: '#3d3d56', mid: '#34344a', near: '#2c2c40', ground: '#242436', fog: '#55566e' },
+        awake: { skyTop: '#0b0a36', skyBot: '#4b2fa8', far: '#2b1f78', mid: '#3a2a8f', near: '#1e1650', ground: '#171040', fog: '#b9a8ff' },
+      },
+      intro: [
+        'The <b>Starfall Citadel</b>, the highest place in the world. This is where the Great Song first broke, and all the stars fell silent.',
+        'The music here is the grandest yet: every <b>key</b>, strange new <b>chords</b>, <b>ornaments</b>, and pieces by <b>Bach</b>, <b>Pachelbel</b> and <b>Beethoven</b>. Let\'s bring the stars back!',
+      ],
+      lessons: REALM_6,
+      planned: ['More songs: Gymnopédie No. 1, Maple Leaf Rag'],
     },
   ],
 };

@@ -77,6 +77,7 @@ for (const realm of CURRICULUM.realms) {
       if (st.task === 'tap') st.targets.forEach(k => pitchOk(w, k));
       if (st.task === 'together') st.notes.forEach(k => pitchOk(w, k));
       if (st.task === 'touch') st.notes.forEach(k => pitchOk(w, k));
+      if (st.task === 'trill') st.notes.forEach(k => pitchOk(w, k));
       if (st.task === 'read') st.notes.forEach(([k]) => pitchOk(w, k));
       if (st.task === 'ear') st.items.forEach(it => { (it.chords || [it.notes]).flat().forEach(k => pitchOk(w, k)); if (!st.choices.some(([v]) => v === it.answer)) fail(w, `answer "${it.answer}" is not a choice`); });
       if (st.task === 'interval') st.pairs.forEach(([a, b, ans]) => {
@@ -86,6 +87,10 @@ for (const realm of CURRICULUM.realms) {
           const d = Math.abs(Music.parsePitch(a).dia - Music.parsePitch(b).dia) + 1;
           if (ans !== ['', 'unison', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'][d]) fail(w, `${a}–${b} is a ${d}, not "${ans}"`);
         }
+      });
+      if (st.task === 'keysig') st.items.forEach(it => {
+        if (!(it.key in Music.KEYS)) fail(w, `unknown key ${it.key}`);
+        if (!st.choices.some(([v]) => v === it.answer)) fail(w, `answer "${it.answer}" is not a choice`);
       });
       if (st.task === 'quiz' && !(st.answer >= 0 && st.answer < st.options.length)) fail(w, 'quiz answer out of range');
       if (st.task === 'rhythm') {
