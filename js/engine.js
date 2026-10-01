@@ -8,6 +8,31 @@ class Performer {
 
   // A tied note lights up every notehead it spans.
   mark(n, cls) { this.score?.mark(n.glyph, cls); n.tied?.forEach(gl => this.score?.mark(gl, cls)); }
+  // With the microphone, a chord is heard as one of its notes, and pitch can slip by an octave.
+  // One microphone hears several notes struck together (a chord, or both hands) as just one of
+  // them, often an octave or two off. So any octave of any note starting on the same beat counts.
+  static micMatch(n, m) {
+    if (n.midi === m || Math.abs(n.midi - m) === 12) return true;
+    const along = n.along || n.chord || [];
+    return along.length > 1 && along.some(c => (c - m) % 12 === 0 && Math.abs(c - m) <= 36);
+  }
+  // Note every pitch that starts together with each note (both hands, all voices).
+  static markAlong(song) {
+    const at = new Map();
+    song.notes.forEach(n => { const k = n.beat.toFixed(4); if (!at.has(k)) at.set(k, []); at.get(k).push(n.midi); });
+    song.notes.forEach(n => { n.along = at.get(n.beat.toFixed(4)); });
+  }
+  // In microphone mode only the melody (the first voice, top note of each chord) is judged.
+  // Fast notes under the pedal keep ringing, so a mic can't tell a re-struck note from a held one:
+  // in pedalled songs with short notes, only the notes on the beat are judged.
+  // ...and their pitches can't be checked reliably either, so the mic checks the timing only.
+  static micTimingOnly(song) { return !!song.pedals?.length && song.notes.some(n => n.dur <= 0.5); }
+  static micJudged(n, song) {
+    if (n.voice !== 0 || n.midi !== Math.max(...(n.chord || [n.midi]))) return false;
+    if (song?.pedals?.length && n.dur < 1 && Math.abs(n.beat - Math.round(n.beat)) > 1e-6) return false;
+    return true;
+  }
+
   static sounding(n) { return n.ring || n.dur * (n.stacc ? 0.4 : 0.92); }
   // Schedule one note; a trill alternates quickly with the note above.
   static schedule(n, t0, spb, vel) {
@@ -52,7 +77,9 @@ class Performer {
     this.stop();
     this.active = true;
     this.score?.clear();
-    const notes = this.song.notes.filter(n => hands === 'both' || n.hand === hands);
+    const mic = Mic.active;
+    if (mic) Performer.markAlong(this.song);
+    const notes = this.song.notes.filter(n => (hands === 'both' || n.hand === hands) && (!mic || Performer.micJudged(n, this.song)));
     const groups = Music.groups(notes);
     let gi = 0, got = new Set();
     const show = () => {
@@ -65,19 +92,30 @@ class Performer {
       g.notes.forEach(n => this.mark(n, 'now'));
       onStep?.(gi, groups.length);
     };
-    this.offs.push(Input.on('down', m => {
+    const advance = () => {
+      g0().notes.forEach(n => this.mark(n, 'hit'));
+      gi++;
+      if (gi >= groups.length) { this.stop(); onEnd?.(); return; }
+      show();
+    };
+    const g0 = () => groups[gi];
+    // The microphone: the step is done when one of its notes was just struck.
+    if (mic) this.offs.push(Mic.onStrike(info => {
       if (!this.active) return;
+      const g = g0();
+      if (g.notes.some(n => info.has(n.midi) || (info.midi != null && Performer.micMatch(n, info.midi)))) {
+        g.notes.forEach(n => this.piano.flash(n.midi, 'good'));
+        advance();
+      } else if (info.midi != null) { this.piano.flash(info.midi, 'bad'); onStep?.(gi, groups.length, 'wrong', g); }
+    }));
+    this.offs.push(Input.on('down', (m, vel, src) => {
+      if (!this.active || src === 'mic') return; // microphone strikes are handled above
       const g = groups[gi];
       if (!g.notes.some(n => n.midi === m)) { this.piano.flash(m, 'bad'); onStep?.(gi, groups.length, 'wrong', g); return; }
       got.add(m);
       this.piano.flash(m, 'good');
       this.piano.unhint(m);
-      if (g.notes.every(n => got.has(n.midi))) {
-        g.notes.forEach(n => this.mark(n, 'hit'));
-        gi++;
-        if (gi >= groups.length) { this.stop(); onEnd?.(); return; }
-        show();
-      }
+      if (g.notes.every(n => got.has(n.midi))) advance();
     }));
     show();
   }
@@ -103,7 +141,12 @@ class Performer {
       Sound.click(tA + b * spb, ((k % perBar) + perBar) % perBar === 0);
     }
     const req = [], auto = [];
-    song.notes.forEach(n => (hands === 'both' || n.hand === hands ? req : auto).push(n));
+    const mic = Mic.active;
+    if (mic) Performer.markAlong(song);
+    song.notes.forEach(n => {
+      if (!(hands === 'both' || n.hand === hands)) auto.push(n);
+      else if (!mic || Performer.micJudged(n, song)) req.push(n); // with the mic, the player's piano plays the rest unjudged
+    });
     auto.forEach(n => Performer.schedule(n, tA, spb, (n.vel ?? 0.6) * 0.7));
     // Close notes (eighths) get a narrower window so one press can't claim its neighbour.
     let gap = 1;
@@ -113,9 +156,34 @@ class Performer {
     let wrong = 0, perfect = 0, lastCount = null;
     const now = () => (performance.now() - tP) / 1000;
 
-    this.offs.push(Input.on('down', m => {
+    // The microphone: at each strike, check whether the expected note was in it.
+    const timingOnly = mic && Performer.micTimingOnly(song);
+    if (mic) this.offs.push(Mic.onStrike(info => {
       if (!this.active) return;
-      const t = now();
+      const t = now() - info.lag;
+      if (t < -win) return;
+      const near = req.map((n, i) => [i, Math.abs(n.beat * spb - t)]).filter(([i, d]) => state[i] === 'pending' && d <= win).sort((a, b) => a[1] - b[1]);
+      let hitBeat = null;
+      for (const [i, d] of near) {
+        const n = req[i];
+        if (hitBeat !== null && Math.abs(n.beat - hitBeat) > 1e-6) continue; // only notes struck together
+        if (timingOnly || info.has(n.midi) || (n.chord?.length > 1 && n.chord.some(info.has)) || (info.midi != null && Performer.micMatch(n, info.midi))) {
+          state[i] = 'hit'; hitBeat = n.beat;
+          if (d < 0.1) perfect++;
+          this.piano?.flash(n.midi, 'good');
+          this.mark(n, 'hit');
+        }
+      }
+      if (hitBeat !== null || info.midi == null) return; // a hit, or an unpitched thump
+      // Something else that belongs in the song right now (the other hand, a chord, a ringing note)?
+      const overheard = song.notes.some(n => t >= n.beat * spb - win && t <= (n.beat + n.dur) * spb + win && (info.has(n.midi) || Performer.micMatch(n, info.midi)));
+      const trill = req.some(n => n.trill && (info.midi === n.midi || info.midi === n.trill) && t >= n.beat * spb - win && t <= (n.beat + n.dur) * spb);
+      if (!overheard && !trill) { wrong++; this.piano?.flash(info.midi, 'bad'); }
+    }));
+
+    this.offs.push(Input.on('down', (m, vel, src, lag = 0) => {
+      if (!this.active || (mic && src === 'mic')) return; // microphone strikes are handled above
+      const t = now() - lag;
       if (t < -win) return; // playing along with the count-in isn't a mistake
       let best = -1, bd = 1e9;
       req.forEach((n, i) => {

@@ -3,7 +3,7 @@ const Save = (() => {
   const KEY = 'songlight.v1';
   const fresh = () => ({
     done: {}, meter: {}, guided: {}, teach: {}, seen: {}, pos: {}, realm: 0,
-    settings: { letters: true, computer: false, volume: 0.8, strict: 'standard' },
+    settings: { letters: true, computer: false, volume: 0.8, strict: 'standard', mic: false },
   });
   let d = fresh();
   try {
@@ -108,6 +108,7 @@ const Game = (() => {
       if (o) closeOverlay(o);
     });
     Input.onStatus(updateMidiStatus);
+    Mic.onStatus(updateMicStatus);
     setInterval(savePos, 4000);
     window.addEventListener('pagehide', savePos);
   }
@@ -117,6 +118,7 @@ const Game = (() => {
   function begin() {
     Sound.init();
     Input.initMidi();
+    if (Save.data.settings.mic) Mic.start(); // the Begin click counts as permission to ask
     $('#title').hidden = true;
     $('.hud').hidden = false;
     enterRealm(realmIdx);
@@ -283,7 +285,25 @@ const Game = (() => {
     const reset = $('#set-reset');
     reset.textContent = 'Start over'; reset.dataset.armed = '';
     updateMidiStatus();
+    updateMicStatus();
     $('#settings').hidden = false;
+    meterLoop();
+  }
+  // A live loudness bar while the settings are open, so you can see the microphone hearing you.
+  function meterLoop() {
+    if ($('#settings').hidden) return;
+    const bar = $('.mic-meter span');
+    if (bar) bar.style.width = Mic.active ? Math.min(100, Math.round(Math.sqrt(Mic.level) * 220)) + '%' : '0%';
+    requestAnimationFrame(meterLoop);
+  }
+  function updateMicStatus() {
+    const el = $('#mic-status');
+    if (!el) return;
+    el.textContent = Mic.status;
+    el.classList.toggle('ok', Mic.active);
+    $('#set-mic').textContent = Mic.active ? 'Stop listening' : 'Listen with the microphone';
+    $('.mic-heard').textContent = Mic.active && Mic.heard ? 'I hear ' + Mic.heard : '';
+    $('.hud .midi-dot')?.classList.toggle('ok', Input.midiConnected || Mic.active);
   }
   function applySettings() {
     const s = Save.data.settings;
@@ -294,7 +314,7 @@ const Game = (() => {
     if (!el) return;
     el.textContent = Input.midiState;
     el.classList.toggle('ok', Input.midiConnected);
-    $('.hud .midi-dot')?.classList.toggle('ok', Input.midiConnected);
+    $('.hud .midi-dot')?.classList.toggle('ok', Input.midiConnected || Mic.active);
   }
   function bindSettings() {
     const s = () => Save.data.settings;
@@ -303,6 +323,10 @@ const Game = (() => {
     $('#set-volume').oninput = e => { s().volume = e.target.value / 100; Sound.setVolume(s().volume); Save.save(); };
     document.querySelectorAll('[name="strict"]').forEach(r => r.onchange = () => { s().strict = r.value; Save.save(); });
     $('#set-midi').onclick = () => Input.initMidi();
+    $('#set-mic').onclick = async () => {
+      if (Mic.active) { Mic.stop(); s().mic = false; } else s().mic = await Mic.start();
+      Save.save(); updateMicStatus();
+    };
     $('#set-reset').onclick = e => {
       const b = e.currentTarget;
       if (!b.dataset.armed) { b.dataset.armed = '1'; b.textContent = 'Tap again to erase all progress'; return; }

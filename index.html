@@ -79,6 +79,16 @@
       <p class="small">Computer keys: bottom row <kbd>Z</kbd>–<kbd>/</kbd> plays C3–E4, top row <kbd>Q</kbd>–<kbd>]</kbd> plays C4–G5, and the rows above them play the black keys. Hold <kbd>Shift</kbd> for the damper pedal.</p>
     </div>
     <div class="set-group">
+      <h3>Acoustic piano (microphone)</h3>
+      <p id="mic-status" class="midi-status">Off</p>
+      <div class="mic-row">
+        <button class="chip-btn" id="set-mic">Listen with the microphone</button>
+        <div class="mic-meter" aria-hidden="true"><span></span></div>
+        <span class="mic-heard" aria-live="polite"></span>
+      </div>
+      <p class="small">Put your device near the piano and wear <b>headphones</b>, so the microphone only hears your playing. It follows one note at a time, so it scores the <b>melody</b> and trusts you with the chords.</p>
+    </div>
+    <div class="set-group">
       <h3>Keyboard labels</h3>
       <label class="toggle"><input type="checkbox" id="set-letters"> Show note names on white keys</label>
       <label class="toggle"><input type="checkbox" id="set-computer"> Show computer-key letters</label>
@@ -104,6 +114,7 @@
 <script src="js/music.js"></script>
 <script src="js/sound.js"></script>
 <script src="js/input.js"></script>
+<script src="js/mic.js"></script>
 <script src="js/piano.js"></script>
 <script src="js/notation.js"></script>
 <script src="js/engine.js"></script>

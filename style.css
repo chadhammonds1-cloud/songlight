@@ -425,3 +425,7 @@ b { font-weight: 800; }
 .score-svg .pedal { fill: none; stroke: var(--ink-2); stroke-width: 1.6; stroke-linejoin: round; }
 .score-svg .tuplet { fill: var(--ink-2); font: italic 800 1em Georgia, 'Times New Roman', serif; }
 .score-svg .trill { fill: var(--ink); font: italic 800 1em Georgia, 'Times New Roman', serif; }
+.mic-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.mic-meter { flex: 1 1 120px; height: 10px; border-radius: 6px; background: rgba(60, 50, 120, 0.12); overflow: hidden; min-width: 100px; }
+.mic-meter span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #19c3b3, #ffc233); transition: width 60ms linear; }
+.mic-heard { font-weight: 800; color: #0b8a7c; min-width: 6em; }

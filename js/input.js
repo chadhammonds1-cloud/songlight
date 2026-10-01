@@ -1,9 +1,11 @@
 'use strict';
-// All note input funnels through here: MIDI keyboards, the computer keyboard, and on-screen keys.
+// All note input funnels through here: MIDI keyboards, the microphone, the computer keyboard, and on-screen keys.
 const Input = (() => {
   const subs = { down: new Set(), up: new Set(), pedal: new Set() };
   let pedal = false;
   const held = new Map(); // midi -> source
+  const heldPort = new Map(); // midi -> id of the MIDI port holding it
+  let midiAccess = null, pedalPort = null;
   let midiState = 'Not connected yet';
   let midiConnected = false;
   const listeners = new Set();
@@ -23,11 +25,12 @@ const Input = (() => {
 
   const on = (type, fn) => { subs[type].add(fn); return () => subs[type].delete(fn); };
 
-  function down(m, vel = 0.7, src = 'screen') {
+  // lag: seconds between when the note was really played and now (the microphone hears late).
+  function down(m, vel = 0.7, src = 'screen', lag = 0) {
     if (held.has(m)) return;
     held.set(m, src);
-    Sound.noteOn(m, vel);
-    subs.down.forEach(fn => fn(m, vel, src));
+    if (src !== 'mic') Sound.noteOn(m, vel); // an acoustic piano makes its own sound
+    subs.down.forEach(fn => fn(m, vel, src, lag));
   }
   // Damper pedal: MIDI controller 64, or Shift on the computer keyboard.
   function setPedal(on, src = 'keys') {
@@ -65,26 +68,55 @@ const Input = (() => {
   window.addEventListener('blur', () => { for (const [m, src] of [...held]) if (src !== 'midi') up(m, src); setPedal(false); });
 
   function notify() { listeners.forEach(fn => fn()); }
+  const embedded = (() => { try { return window.top !== window; } catch (e) { return true; } })();
   function initMidi() {
-    if (!navigator.requestMIDIAccess) { midiState = 'This browser has no MIDI support (try Chrome or Edge)'; notify(); return; }
+    if (!navigator.requestMIDIAccess) { midiState = 'This browser has no MIDI support. Try Chrome or Edge.'; notify(); return; }
+    if (midiAccess) { bindPorts(); return; }
     navigator.requestMIDIAccess().then(access => {
-      const bind = () => {
-        const names = [];
-        access.inputs.forEach(inp => { names.push(inp.name); inp.onmidimessage = onMidi; });
-        midiConnected = names.length > 0;
-        midiState = names.length ? 'Connected: ' + names.join(', ') : 'No MIDI keyboard found — plug one in any time';
-        notify();
-      };
-      access.onstatechange = bind;
-      bind();
-    }).catch(() => { midiState = 'MIDI access was blocked on this page'; notify(); });
+      midiAccess = access;
+      access.onstatechange = bindPorts; // keyboards can be plugged in or out at any time
+      bindPorts();
+    }).catch(() => {
+      midiState = embedded
+        ? 'MIDI is blocked inside this embedded page. Download Songlight and open the file directly to use a keyboard.'
+        : 'MIDI access was blocked. Allow MIDI devices for this page in your browser\'s site settings, then try again.';
+      notify();
+    });
   }
-  function onMidi(e) {
-    const [st, n, v] = e.data;
+  function bindPorts() {
+    const names = [], live = new Set();
+    midiAccess.inputs.forEach(inp => {
+      if (inp.state === 'disconnected') return;
+      live.add(inp.id); names.push(inp.name);
+      inp.onmidimessage = e => onMidi(e, inp.id);
+    });
+    // A keyboard unplugged mid-note can't send its note-offs: release them so nothing sticks.
+    for (const [m, port] of [...heldPort]) if (!live.has(port)) { heldPort.delete(m); up(m, 'midi'); }
+    if (pedalPort && !live.has(pedalPort)) { pedalPort = null; setPedal(false, 'midi'); }
+    midiConnected = names.length > 0;
+    midiState = names.length ? 'Connected: ' + names.join(', ') : 'No MIDI keyboard found. Plug one in any time.';
+    notify();
+  }
+  function releaseMidi() {
+    for (const m of [...heldPort.keys()]) { heldPort.delete(m); up(m, 'midi'); }
+    setPedal(false, 'midi');
+  }
+  function onMidi(e, port) {
+    const [st, n, v = 0] = e.data;
     const cmd = st & 0xf0;
-    if (cmd === 0x90 && v > 0) { Sound.init(); down(n, v / 127, 'midi'); }
-    else if (cmd === 0x80 || (cmd === 0x90 && v === 0)) up(n, 'midi');
-    else if (cmd === 0xb0 && n === 64) setPedal(v >= 64, 'midi');
+    if (cmd === 0x90 && v > 0) {
+      Sound.init();
+      // A note-on for a key we think is still down means a note-off was lost: re-strike it.
+      if (held.has(n)) { heldPort.delete(n); up(n, held.get(n)); }
+      heldPort.set(n, port);
+      down(n, Math.max(0.08, v / 127), 'midi');
+    } else if (cmd === 0x80 || (cmd === 0x90 && v === 0)) {
+      if (heldPort.has(n) && heldPort.get(n) !== port) return; // another keyboard still holds it
+      heldPort.delete(n); up(n, 'midi');
+    } else if (cmd === 0xb0) {
+      if (n === 64) { pedalPort = v >= 64 ? port : null; setPedal(v >= 64, 'midi'); }
+      else if (n === 120 || n === 123) releaseMidi(); // all sound off / all notes off
+    }
   }
 
   return {
@@ -93,6 +125,7 @@ const Input = (() => {
     onStatus: fn => { listeners.add(fn); return () => listeners.delete(fn); },
     get midiState() { return midiState; },
     get midiConnected() { return midiConnected; },
+    get embedded() { return embedded; },
     keyFor: m => REVERSE[m] || '',
     isHeld: m => held.has(m),
   };

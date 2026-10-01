@@ -109,6 +109,7 @@ const Music = (() => {
               beat: e.beat + pass * length, dur: e.dur, midi: p.midi, hand: e.hand,
               finger: e.fingers[pi] ?? e.fingers[0], glyph: vi + ':' + ei, tied: [], pass,
               vel: e.vel, stacc: e.stacc,
+              voice: vi, chord: e.pitches.map(q => q.midi), // for the microphone, which hears chords as one note
             };
             if (e.trill) n.trill = upperNeighbor(p, keySig);
             notes.push(n); made.push(n);

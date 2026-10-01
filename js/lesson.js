@@ -36,6 +36,8 @@ const LessonUI = (() => {
   }
   const later = (fn, ms) => timers.push(setTimeout(fn, ms));
   const listen = (type, fn) => offs.push(Input.on(type, fn));
+  // The microphone sometimes hears a note an octave off: count it as the note we were waiting for.
+  const octFix = (m, src, want) => (src === 'mic' && !want.includes(m) ? want.find(x => Math.abs(x - m) === 12) ?? m : m);
   function onKey(fn) { window.addEventListener('keydown', fn); offs.push(() => window.removeEventListener('keydown', fn)); }
 
   function open(ls, o = {}) {
@@ -241,8 +243,9 @@ const LessonUI = (() => {
       const fb = feedback(w);
       const hintNext = () => { if (st.hint) piano.hint([{ midi: targets[idx], finger: st.fingers?.[idx], hand: st.hand || 'R' }]); };
       if (st.order) hintNext();
-      listen('down', m => {
+      listen('down', (m0, vel, src) => {
         if (found.size === targets.length) return;
+        const m = octFix(m0, src, st.order ? [targets[idx]] : targets.filter(x => !found.has(x)));
         if (st.order) {
           if (m === targets[idx]) {
             found.add(m); chips[idx].classList.add('got'); piano.flash(m, 'good'); piano.unhint(m); piano.glow([m], 'found');
@@ -296,8 +299,9 @@ const LessonUI = (() => {
         const [p, hand] = st.notes[k];
         Notation.render(host, Music.compile({ time: [4, 4], key: st.key, notation: 'staff', voices: [{ hand, notes: p + ':w' }] }), { hideTime: true, maxPerLine: 1, width: 260, sp: 11 });
       };
-      listen('down', m => {
+      listen('down', (m0, vel, src) => {
         if (k >= st.notes.length) return;
+        const m = octFix(m0, src, [Music.midi(st.notes[k][0])]);
         if (m === Music.midi(st.notes[k][0])) {
           piano.flash(m, 'good'); k++;
           $('.pips', el).innerHTML = pips(st.notes.length, k);
@@ -313,8 +317,17 @@ const LessonUI = (() => {
       piano.hint(ms.map((m, i) => ({ midi: m, finger: st.fingers?.[i], hand: st.hands?.[i] || (m < 60 ? 'L' : 'R') })));
       const el = add(w, `<div class="pips big">${pips(st.count, 0)}</div>`);
       const fb = feedback(w);
-      listen('down', m => {
+      listen('down', (m, vel, src) => {
         if (n >= st.count) return;
+        if (src === 'mic' && ms.some(x => x === m || Math.abs(x - m) === 12)) {
+          // one microphone hears a chord as a single note, so one right note counts
+          if (performance.now() - (times.mic || 0) < 400) return;
+          times.mic = performance.now();
+          ms.forEach(x => piano.flash(x, 'good'));
+          n++; el.innerHTML = pips(st.count, n);
+          if (n >= st.count) { fb((st.praise || 'Both hands, together!') + ' ' + praise()); done(); } else fb('Again!');
+          return;
+        }
         if (!ms.includes(m)) { piano.flash(m, 'bad'); return; }
         times[m] = performance.now();
         const now = performance.now();
@@ -346,8 +359,9 @@ const LessonUI = (() => {
         Sound.chime('soft'); fb(praise() + ' Smooth as water.');
         later(() => { chips.forEach(c => c.classList.remove('got')); hintNext(); say(); }, 900);
       };
-      listen('down', m => {
+      listen('down', (m0, vel, src) => {
         if (r >= rounds.length || idx >= targets.length) return;
+        const m = octFix(m0, src, [targets[idx]]);
         if (m !== targets[idx]) { piano.flash(m, 'bad'); return; }
         const now = performance.now();
         if (rounds[r] === 'legato' && idx > 0 && !Input.isHeld(targets[idx - 1]) && now - lastUp > 110) {
@@ -386,9 +400,10 @@ const LessonUI = (() => {
         else if (!on && phase === 'play') { phase = 'down'; idx = 0; chips.forEach(c => c.classList.remove('got')); piano.clearHints(); $('[data-p="down"]', w).classList.remove('got'); fb('The pedal came up too soon. Press it down again and play all the notes first.'); }
         else if (!on && phase === 'up') { phase = 'done'; mark('up'); fb('Listen: the sound stops when the pedal lifts. ' + praise()); done(); }
       }));
-      listen('down', m => {
+      listen('down', (m0, vel, src) => {
         if (phase === 'down') { fb('Press the pedal first (or hold <kbd>Shift</kbd>).'); return; }
         if (phase !== 'play') return;
+        const m = octFix(m0, src, [targets[idx]]);
         if (m !== targets[idx]) { piano.flash(m, 'bad'); return; }
         piano.flash(m, 'good'); piano.unhint(m); chips[idx].classList.add('got'); idx++;
         if (idx < targets.length) hintNext();
@@ -448,9 +463,9 @@ const LessonUI = (() => {
       piano.hint([{ midi: a, finger: st.fingers?.[0], hand: 'R' }, { midi: b, finger: st.fingers?.[1], hand: 'R' }]);
       const el = add(w, `<div class="pips big">${pips(st.count, 0)}</div>`);
       const fb = feedback(w);
-      listen('down', m => {
+      listen('down', (m0, vel, src) => {
         if (finished) return;
-        const now = performance.now();
+        const now = performance.now(), m = octFix(m0, src, [a, b]);
         if (m !== a && m !== b) { piano.flash(m, 'bad'); return; }
         if (m === last || now - lastT > 320) run = 0; // must alternate, and keep it quick
         if (run === 0 && m !== a) { last = m; lastT = now; fb('Start on the <b>main</b> note, then alternate.'); return; }
@@ -471,7 +486,7 @@ const LessonUI = (() => {
         bar.style.width = Math.round(vel * 100) + '%';
         if (src !== 'midi') {
           mark(step === 0 ? 'f' : 'p'); step++;
-          if (step >= 2) { fb('Your computer can\'t hear how hard you press, but a real piano can! Try loud and soft on one.'); done(); }
+          if (step >= 2) { fb(src === 'mic' ? 'Nice! Loud and soft really shows on an acoustic piano.' : 'Your computer can\'t hear how hard you press, but a real piano can! Try loud and soft on one.'); done(); }
           else fb('Now pretend to play it very softly…');
           return;
         }
@@ -590,6 +605,9 @@ const LessonUI = (() => {
       });
       $('.tempo', body).hidden = mode !== 'beat';
       help.innerHTML = mode === 'perform' && !performUnlocked() ? 'Finish one <b>Guided</b> practice first, then the performance opens.' : HELP[mode];
+      if (Mic.active && mode !== 'listen') help.innerHTML += Performer.micTimingOnly(song)
+        ? ' <b>Microphone:</b> the pedal keeps every note ringing here, so it checks your <b>timing</b> only.'
+        : song.voices.length > 1 ? ' <b>Microphone:</b> it listens for the melody and trusts you with the other hand.' : '';
       stage(mode === 'perform' ? 'perform' : 'practice');
       go.textContent = '▶ ' + ({ listen: 'Listen', guided: 'Start guided', beat: 'Start', perform: 'Perform' })[mode];
       go.disabled = mode === 'perform' && !performUnlocked();
