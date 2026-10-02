@@ -651,7 +651,10 @@ const LessonUI = (() => {
     };
 
     function judge(r) {
-      const S = STRICT[Save.data.settings.strict] || STRICT.standard;
+      let S = STRICT[Save.data.settings.strict] || STRICT.standard;
+      // A microphone misses a few notes even when you play perfectly (and wrong notes score near
+      // zero), so it passes at 80% (90% on Strict) and forgives a few overheard extra notes.
+      if (Mic.active) S = { acc: Math.min(S.acc, Save.data.settings.strict === 'strict' ? 0.9 : 0.8), wrong: S.wrong + 5 };
       const pass = r.total > 0 && r.hits / r.total >= S.acc && r.wrong <= S.wrong;
       const wasDone = !!Save.data.done[id];
       if (pass && !wasDone) {

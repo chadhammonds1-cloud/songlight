@@ -138,14 +138,15 @@ const Mic = (() => {
   function snapshot(onsetAgoMs) {
     const x = Float32Array.from(buf), sr = ctx.sampleRate;
     const at = HIST - Math.round(onsetAgoMs / 1000 * sr); // where the attack is in x
-    const post = Math.min(HIST - SEG, at + Math.round(0.006 * sr)), pre = Math.max(0, at - SEG - Math.round(0.004 * sr));
+    // The strike's position is only known to ~20 ms, so leave a gap on both sides of it.
+    const post = Math.min(HIST - SEG, at + Math.round(0.015 * sr)), pre = Math.max(0, at - SEG - Math.round(0.03 * sr));
     const memo = new Map();
     return midi => {
       if (memo.has(midi)) return memo.get(midi);
       const now = strength(x, post, SEG, midi), before = strength(x, pre, SEG, midi);
       // compare with the semitones either side: a real note peaks exactly on its own frequencies
       const side = (strength(x, post, SEG, midi - 1) + strength(x, post, SEG, midi + 1)) / 2;
-      const ok = now > before * 1.8 && now > side * 2.2 && now > 1e-4;
+      const ok = now > before * 1.5 && now > side * 2.2 && now > 1e-4;
       memo.set(midi, ok);
       return ok;
     };
